@@ -17,6 +17,7 @@ import { EditarEmprestimo } from './paginas/EditarEmprestimo';
 import { Cobrar } from './paginas/Cobrar';
 import { Mais } from './paginas/Mais';
 import { Instalar } from './paginas/Instalar';
+import { Relatorios } from './paginas/Relatorios';
 import { Privacidade } from './paginas/Privacidade';
 
 export function App() {
@@ -70,6 +71,7 @@ export function App() {
         <Route path="/novo" element={<NovoEmprestimo />} />
         <Route path="/mais" element={<Mais />} />
         <Route path="/usuarios" element={<SoAdmin><Usuarios /></SoAdmin>} />
+        <Route path="/relatorios" element={<SoAdmin><Relatorios /></SoAdmin>} />
         <Route path="/privacidade" element={<Privacidade />} />
         <Route path="/instalar" element={<Instalar />} />
         <Route path="/definir-senha" element={<DefinirSenha />} />

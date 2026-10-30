@@ -26,6 +26,11 @@ export function Layout() {
         <NavLink to="/novo">
           <span aria-hidden>＋</span>Novo
         </NavLink>
+        {ehAdmin && (
+          <NavLink to="/relatorios">
+            <span aria-hidden>▥</span>Relatórios
+          </NavLink>
+        )}
         <NavLink to="/mais">
           <span aria-hidden>⋯</span>Mais
         </NavLink>

@@ -14,6 +14,13 @@
   --sucesso-fundo: #e5f4ec;
   --sucesso-texto: #0f5132;
   --raio: 12px;
+  /* Cores dos gráficos (validadas para daltonismo contra o fundo claro e o escuro) */
+  --serie-1: #2a78d6;
+  --serie-2: #eb6834;
+  --serie-3: #1baf7a;
+  --grade: #e8ece9;
+  --eixo: #c3c9c5;
+  --sobe: #006300;
   color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
@@ -31,6 +38,12 @@
     --alerta-texto: #ffd877;
     --sucesso-fundo: #12301f;
     --sucesso-texto: #8be0b2;
+    --serie-1: #3987e5;
+    --serie-2: #d95926;
+    --serie-3: #199e70;
+    --grade: #26302c;
+    --eixo: #3a4641;
+    --sobe: #3fc46a;
   }
 }
 
@@ -300,3 +313,43 @@ input[type='search'] { margin-bottom: 10px; }
 .menu-lista a, .menu-lista button { display: block; width: 100%; text-align: left; padding: 14px 16px; text-decoration: none; color: var(--texto); font-size: 1rem; }
 .perigo-texto { color: var(--perigo) !important; }
 .passos li { margin-bottom: 8px; }
+
+/* Relatórios */
+.datas-periodo { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.numero small.sobe { color: var(--sobe); font-weight: 600; }
+.numero small.desce { color: var(--perigo); font-weight: 600; }
+.numero.destaque small { color: var(--marca-texto); opacity: 0.9; }
+.grafico { margin: 0 0 16px; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); padding: 12px; }
+.grafico-topo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.grafico-topo .link { padding: 4px; }
+.legenda { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 0; margin: 0 0 8px; font-size: 0.85rem; color: var(--suave); }
+.legenda li { display: flex; align-items: center; gap: 6px; }
+.amostra { display: inline-block; width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.grafico-area { position: relative; width: 100%; touch-action: pan-y; }
+.grafico-area svg { display: block; }
+.grafico .grade { stroke: var(--grade); stroke-width: 1; }
+.grafico .eixo { stroke: var(--eixo); stroke-width: 1; }
+.grafico .marca { fill: var(--suave); font-size: 11px; font-variant-numeric: tabular-nums; }
+.grafico-vazio { position: absolute; inset: 0 0 22px 52px; display: grid; place-items: center; margin: 0; font-size: 0.9rem; pointer-events: none; }
+.dica {
+  position: absolute;
+  top: 4px;
+  transform: translateX(-50%);
+  min-width: 170px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 8px 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  font-size: 0.85rem;
+  pointer-events: none;
+  z-index: 1;
+}
+.dica-linha { display: grid; grid-template-columns: 10px 1fr auto; align-items: center; gap: 6px; margin-top: 3px; color: var(--suave); }
+.dica-linha.total { border-top: 1px solid var(--borda); padding-top: 3px; color: var(--texto); font-weight: 600; }
+.dica-valor { color: var(--texto); font-variant-numeric: tabular-nums; }
+.tabela-rolagem { overflow-x: auto; max-height: 320px; overflow-y: auto; }
+.tabela { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.tabela th, .tabela td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--borda); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tabela th:first-child, .tabela td:first-child { text-align: left; }
+.tabela th { color: var(--suave); font-weight: 600; position: sticky; top: 0; background: var(--superficie); }
