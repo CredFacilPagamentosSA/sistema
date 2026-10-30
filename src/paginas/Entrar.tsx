@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
 import { supabase } from '../lib/supabase';
 import { mensagemDeErro } from '../lib/erros';
+import { NOME_EMPRESA } from '../marca';
 
 export function Entrar() {
   const [email, setEmail] = useState('');
@@ -21,7 +22,7 @@ export function Entrar() {
   return (
     <main className="centro">
       <form className="cartao" onSubmit={entrar}>
-        <h1>CredFacil</h1>
+        <h1>{NOME_EMPRESA}</h1>
         <p className="suave">Entre com seu e-mail e senha.</p>
         <label>
           E-mail

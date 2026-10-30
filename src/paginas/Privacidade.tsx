@@ -1,10 +1,11 @@
 import { Link } from 'react-router';
+import { NOME_EMPRESA } from '../marca';
 
 export function Privacidade() {
   return (
     <section className="texto">
       <h1>Política de privacidade</h1>
-      <p className="suave">CredFacil – sistema interno de controle de empréstimos</p>
+      <p className="suave">{NOME_EMPRESA} – sistema interno de controle de empréstimos</p>
 
       <h2>Quais dados guardamos</h2>
       <p>
@@ -21,7 +22,7 @@ export function Privacidade() {
 
       <h2>Quem tem acesso</h2>
       <p>
-        Apenas funcionários da CredFacil com login e senha. Os dados ficam em servidores do Supabase, com tráfego
+        Apenas funcionários da {NOME_EMPRESA} com login e senha. Os dados ficam em servidores do Supabase, com tráfego
         protegido (HTTPS) e cópias de segurança diárias.
       </p>
 
@@ -34,7 +35,7 @@ export function Privacidade() {
       <h2>Seus direitos</h2>
       <p>
         Pela Lei Geral de Proteção de Dados (LGPD), o cliente pode pedir para saber quais dados temos sobre ele e
-        pedir correção. Para isso, fale com a CredFacil pelo mesmo WhatsApp usado no atendimento.
+        pedir correção. Para isso, fale com a {NOME_EMPRESA} pelo mesmo WhatsApp usado no atendimento.
       </p>
 
       <p><Link to="/">Voltar</Link></p>

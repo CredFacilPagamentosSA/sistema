@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth, type Perfil } from '../lib/auth';
 import { mensagemDeErro } from '../lib/erros';
+import { NOME_EMPRESA } from '../marca';
 
 async function chamarFuncaoUsuarios(corpo: Record<string, unknown>) {
   const { data, error } = await supabase.functions.invoke('usuarios', { body: corpo });
@@ -83,7 +84,7 @@ export function Usuarios() {
       {usuarios.length > 0 && adminsAtivos < 2 && (
         <p className="alerta">
           <strong>Atenção:</strong> só existe {adminsAtivos} administrador. Cadastre pelo menos mais um (por exemplo,
-          um sócio) para a CredFacil nunca perder o acesso ao sistema.
+          um sócio) para a {NOME_EMPRESA} nunca perder o acesso ao sistema.
         </p>
       )}
 

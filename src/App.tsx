@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
 import { useAuth } from './lib/auth';
 import { supabaseConfigurado } from './lib/supabase';
+import { NOME_EMPRESA } from './marca';
 import { Layout } from './componentes/Layout';
 import { Entrar } from './paginas/Entrar';
 import { EsqueciSenha } from './paginas/EsqueciSenha';
@@ -17,7 +18,7 @@ export function App() {
     return (
       <main className="centro">
         <div className="cartao">
-          <h1>CredFacil</h1>
+          <h1>{NOME_EMPRESA}</h1>
           <p>O app ainda não foi ligado ao banco de dados. Falta cadastrar as chaves do Supabase.</p>
         </div>
       </main>
@@ -72,7 +73,7 @@ function AcessoDesativado() {
     <main className="centro">
       <div className="cartao">
         <h1>Acesso desativado</h1>
-        <p>Este usuário não tem acesso ao sistema. Fale com um administrador da CredFacil.</p>
+        <p>Este usuário não tem acesso ao sistema. Fale com um administrador da {NOME_EMPRESA}.</p>
         <button className="botao" onClick={sair}>Sair</button>
       </div>
     </main>
