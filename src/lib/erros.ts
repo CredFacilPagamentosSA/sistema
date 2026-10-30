@@ -6,7 +6,7 @@ const traducoes: [RegExp, string][] = [
   [/rate limit|too many requests|for security purposes/i, 'Muitas tentativas seguidas. Aguarde alguns minutos e tente de novo.'],
   [/password should be at least/i, 'A senha precisa ter pelo menos 8 caracteres.'],
   [/new password should be different/i, 'A nova senha precisa ser diferente da anterior.'],
-  [/weak password|password is known to be weak/i, 'Senha fraca. Use letras, números e pelo menos 8 caracteres.'],
+  [/weak password|password is known to be weak|should contain at least one character/i, 'Senha fraca. Use pelo menos 8 caracteres, com letra minúscula, MAIÚSCULA e número.'],
   [/already been registered|already registered/i, 'Já existe um usuário com este e-mail.'],
   [/failed to fetch|network/i, 'Sem conexão com a internet. Verifique e tente de novo.'],
   [/jwt expired|session.*(missing|expired)/i, 'Sua sessão expirou. Entre novamente.'],

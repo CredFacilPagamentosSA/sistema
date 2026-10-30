@@ -17,6 +17,9 @@ export function DefinirSenha() {
     e.preventDefault();
     setErro('');
     if (senha.length < 8) return setErro('A senha precisa ter pelo menos 8 caracteres.');
+    if (!/[a-z]/.test(senha) || !/[A-Z]/.test(senha) || !/[0-9]/.test(senha)) {
+      return setErro('A senha precisa ter pelo menos uma letra minúscula, uma MAIÚSCULA e um número.');
+    }
     if (senha !== confirmacao) return setErro('As duas senhas não são iguais.');
     setEnviando(true);
     const { error } = await supabase.auth.updateUser({ password: senha });
@@ -30,7 +33,9 @@ export function DefinirSenha() {
     <main className="centro">
       <form className="cartao" onSubmit={salvar}>
         <h1>Criar senha</h1>
-        <p className="suave">Use pelo menos 8 caracteres, misturando letras e números.</p>
+        <p className="suave">
+          Use pelo menos 8 caracteres, com letra minúscula, letra MAIÚSCULA e número. Exemplo: Cafe2026Forte
+        </p>
         <label>
           Nova senha
           <input type="password" autoComplete="new-password" required value={senha} onChange={(e) => setSenha(e.target.value)} />
