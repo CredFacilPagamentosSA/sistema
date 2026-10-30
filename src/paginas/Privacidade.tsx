@@ -9,15 +9,21 @@ export function Privacidade() {
 
       <h2>Quais dados guardamos</h2>
       <p>
-        De cada cliente, guardamos apenas o <strong>nome</strong> e o <strong>WhatsApp</strong>, além dos valores,
-        datas e pagamentos dos empréstimos. Dos usuários do sistema, guardamos nome, e-mail e o registro das ações
-        que cada um fez.
+        De cada cliente: <strong>nome, CPF, data de nascimento, WhatsApp, e-mail e endereço</strong>, além de
+        observações sobre o atendimento e dos valores, datas e pagamentos dos empréstimos. Dos usuários do sistema:
+        nome, e-mail e o registro das ações que cada um fez.
       </p>
 
       <h2>Para que usamos</h2>
       <p>
-        Somente para controlar os empréstimos, os vencimentos e os recebimentos, e para entrar em contato com o
-        cliente sobre o empréstimo dele. Não vendemos nem compartilhamos esses dados para outras finalidades.
+        Para identificar corretamente quem recebe o empréstimo, controlar vencimentos e recebimentos, entrar em
+        contato sobre o empréstimo e, se necessário, cobrar valores em atraso. A base legal é a execução do contrato
+        de empréstimo e a proteção do crédito (Lei 13.709/2018 – LGPD, art. 7º, incisos V e X). Não vendemos nem
+        compartilhamos esses dados para outras finalidades.
+      </p>
+      <p>
+        Ao digitar um CEP, apenas o CEP é consultado no serviço público ViaCEP para preencher o endereço
+        automaticamente.
       </p>
 
       <h2>Quem tem acesso</h2>
@@ -35,7 +41,7 @@ export function Privacidade() {
       <h2>Seus direitos</h2>
       <p>
         Pela Lei Geral de Proteção de Dados (LGPD), o cliente pode pedir para saber quais dados temos sobre ele e
-        pedir correção. Para isso, fale com a {NOME_EMPRESA} pelo mesmo WhatsApp usado no atendimento.
+        pedir correção. Toda alteração no cadastro fica registrada, com data e responsável. Para isso, fale com a {NOME_EMPRESA} pelo mesmo WhatsApp usado no atendimento.
       </p>
 
       <p><Link to="/">Voltar</Link></p>

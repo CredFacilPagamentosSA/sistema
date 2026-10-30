@@ -18,6 +18,9 @@ import { Cobrar } from './paginas/Cobrar';
 import { Mais } from './paginas/Mais';
 import { Instalar } from './paginas/Instalar';
 import { Relatorios } from './paginas/Relatorios';
+import { Clientes } from './paginas/Clientes';
+import { FichaCliente } from './paginas/FichaCliente';
+import { EditarCliente, NovoCliente } from './paginas/EditarCliente';
 import { Privacidade } from './paginas/Privacidade';
 
 export function App() {
@@ -69,6 +72,10 @@ export function App() {
         <Route path="/emprestimos/:id/editar" element={<EditarEmprestimo />} />
         <Route path="/emprestimos/:id/cobrar" element={<Cobrar />} />
         <Route path="/novo" element={<NovoEmprestimo />} />
+        <Route path="/clientes" element={<Clientes />} />
+        <Route path="/clientes/novo" element={<NovoCliente />} />
+        <Route path="/clientes/:id" element={<FichaCliente />} />
+        <Route path="/clientes/:id/editar" element={<EditarCliente />} />
         <Route path="/mais" element={<Mais />} />
         <Route path="/usuarios" element={<SoAdmin><Usuarios /></SoAdmin>} />
         <Route path="/relatorios" element={<SoAdmin><Relatorios /></SoAdmin>} />

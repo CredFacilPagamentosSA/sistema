@@ -59,6 +59,9 @@ export function DetalheEmprestimo() {
       <p className="suave">
         WhatsApp {formatarWhatsapp(e.cliente_whatsapp)} · <EtiquetaSituacao e={e} />
       </p>
+      <p>
+        <Link to={`/clientes/${e.cliente_id}`}>Ver cadastro completo do cliente ›</Link>
+      </p>
 
       {aviso && <p className="sucesso" role="status">{aviso}</p>}
       {avisoAcao && <p className="sucesso" role="status">{avisoAcao}</p>}

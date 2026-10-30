@@ -72,7 +72,10 @@ function FormularioEdicao({ e }: { e: Emprestimo }) {
             <CampoDinheiro rotulo="Juros do ciclo atual" valor={jurosTxt} aoMudar={setJurosTxt} obrigatorio />
           </>
         )}
-        <p className="suave pequeno">Toda edição fica no histórico e pode ser desfeita.</p>
+        <p className="suave pequeno">
+          Toda edição fica no histórico e pode ser desfeita. Para CPF, endereço e outros dados, use{' '}
+          <Link to={`/clientes/${e.cliente_id}/editar`}>Editar cadastro do cliente</Link>.
+        </p>
         {erro && <p className="erro" role="alert">{erro}</p>}
         <button className="botao" disabled={enviando}>{enviando ? 'Salvando…' : 'Salvar alterações'}</button>
       </form>

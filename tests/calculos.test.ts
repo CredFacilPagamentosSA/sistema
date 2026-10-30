@@ -2,6 +2,22 @@
 import { describe, expect, it } from 'vitest';
 import { calcularJuros, formatarParaCampo, formatarReais, jurosPorPercentual, lerPercentual, lerReais } from '../src/lib/dinheiro';
 import { diasEntre, formatarData, hojeSP, somarDias, somarMeses } from '../src/lib/datas';
+import { cpfValido, formatarCep, formatarCpf } from '../src/lib/clientes';
+
+describe('CPF e CEP na tela', () => {
+  it('confere os dígitos do CPF igual ao banco', () => {
+    expect(cpfValido('529.982.247-25')).toBe(true);
+    expect(cpfValido('11144477735')).toBe(true);
+    expect(cpfValido('123.456.789-00')).toBe(false);
+    expect(cpfValido('111.111.111-11')).toBe(false);
+    expect(cpfValido('5299822472')).toBe(false);
+  });
+
+  it('formata para exibir', () => {
+    expect(formatarCpf('52998224725')).toBe('529.982.247-25');
+    expect(formatarCep('01310100')).toBe('01310-100');
+  });
+});
 
 describe('Leitura de valores digitados', () => {
   it('entende os jeitos comuns de digitar dinheiro', () => {

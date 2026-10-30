@@ -314,6 +314,20 @@ input[type='search'] { margin-bottom: 10px; }
 .perigo-texto { color: var(--perigo) !important; }
 .passos li { margin-bottom: 8px; }
 
+/* Cadastro de clientes */
+.grupo { border: none; padding: 0; margin: 4px 0 0; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.grupo legend { font-weight: 700; font-size: 1rem; padding: 0; margin-bottom: 8px; color: var(--marca); }
+.dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dupla.larga { grid-template-columns: 1fr 88px; }
+textarea { font: inherit; resize: vertical; }
+.erro-texto { color: var(--perigo); }
+.ficha { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0 16px; }
+.ficha > div { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); padding: 10px 12px; min-width: 0; }
+.ficha .inteira { grid-column: 1 / -1; }
+.ficha dt { font-size: 0.8rem; color: var(--suave); }
+.ficha dd { margin: 2px 0 0; font-weight: 600; overflow-wrap: anywhere; }
+.menu-lista button strong { font-weight: 600; }
+
 /* Relatórios */
 .datas-periodo { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
 .numero small.sobe { color: var(--sobe); font-weight: 600; }

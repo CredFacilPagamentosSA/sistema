@@ -38,6 +38,7 @@ export function Mais() {
       </form>
 
       <ul className="menu-lista">
+        {ehAdmin && <li><Link to="/relatorios">Relatórios</Link></li>}
         {ehAdmin && <li><Link to="/usuarios">Usuários e acessos</Link></li>}
         <li><Link to="/privacidade">Política de privacidade</Link></li>
         <li><Link to="/instalar">Instalar no iPhone</Link></li>

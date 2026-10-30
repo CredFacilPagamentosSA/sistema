@@ -4,6 +4,7 @@ import { consultar, useCarregar } from '../lib/useCarregar';
 import { formatarReais } from '../lib/dinheiro';
 import type { Emprestimo } from '../lib/emprestimos';
 import { CartaoEmprestimo } from '../componentes/CartaoEmprestimo';
+import { useAuth } from '../lib/auth';
 
 type Numeros = {
   dinheiro_na_rua: number;
@@ -15,6 +16,7 @@ type Numeros = {
 };
 
 export function Painel() {
+  const { ehAdmin } = useAuth();
   const { dados, erro, carregando } = useCarregar(async () => {
     const [numeros, abertos] = await Promise.all([
       consultar<Numeros>(supabase.rpc('painel')),
@@ -32,7 +34,10 @@ export function Painel() {
 
   return (
     <section>
-      <h1>Painel</h1>
+      <div className="titulo-com-acao">
+        <h1>Painel</h1>
+        {ehAdmin && <Link to="/relatorios" className="botao secundario pequeno-botao">Relatórios</Link>}
+      </div>
 
       <div className="numeros">
         <div className="numero destaque">
