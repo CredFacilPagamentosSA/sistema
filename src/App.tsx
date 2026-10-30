@@ -8,7 +8,15 @@ import { Entrar } from './paginas/Entrar';
 import { EsqueciSenha } from './paginas/EsqueciSenha';
 import { DefinirSenha } from './paginas/DefinirSenha';
 import { Usuarios } from './paginas/Usuarios';
-import { Inicio } from './paginas/Inicio';
+import { Painel } from './paginas/Painel';
+import { Emprestimos } from './paginas/Emprestimos';
+import { NovoEmprestimo } from './paginas/NovoEmprestimo';
+import { DetalheEmprestimo } from './paginas/DetalheEmprestimo';
+import { Receber } from './paginas/Receber';
+import { EditarEmprestimo } from './paginas/EditarEmprestimo';
+import { Cobrar } from './paginas/Cobrar';
+import { Mais } from './paginas/Mais';
+import { Instalar } from './paginas/Instalar';
 import { Privacidade } from './paginas/Privacidade';
 
 export function App() {
@@ -35,7 +43,8 @@ export function App() {
       <Routes>
         <Route path="/entrar" element={<Entrar />} />
         <Route path="/esqueci-senha" element={<EsqueciSenha />} />
-        <Route path="/privacidade" element={<Privacidade />} />
+        <Route path="/privacidade" element={<main className="centro"><Privacidade /></main>} />
+        <Route path="/instalar" element={<main className="centro"><Instalar /></main>} />
         <Route path="*" element={<Navigate to="/entrar" replace />} />
       </Routes>
     );
@@ -52,9 +61,17 @@ export function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<Inicio />} />
+        <Route path="/" element={<Painel />} />
+        <Route path="/emprestimos" element={<Emprestimos />} />
+        <Route path="/emprestimos/:id" element={<DetalheEmprestimo />} />
+        <Route path="/emprestimos/:id/receber" element={<Receber />} />
+        <Route path="/emprestimos/:id/editar" element={<EditarEmprestimo />} />
+        <Route path="/emprestimos/:id/cobrar" element={<Cobrar />} />
+        <Route path="/novo" element={<NovoEmprestimo />} />
+        <Route path="/mais" element={<Mais />} />
         <Route path="/usuarios" element={<SoAdmin><Usuarios /></SoAdmin>} />
         <Route path="/privacidade" element={<Privacidade />} />
+        <Route path="/instalar" element={<Instalar />} />
         <Route path="/definir-senha" element={<DefinirSenha />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

@@ -3,7 +3,7 @@ import { useAuth } from '../lib/auth';
 import { NOME_EMPRESA } from '../marca';
 
 export function Layout() {
-  const { perfil, ehAdmin, sair } = useAuth();
+  const { perfil, ehAdmin } = useAuth();
   return (
     <div className="app">
       <header className="topo">
@@ -12,14 +12,23 @@ export function Layout() {
           {perfil?.nome || perfil?.email}
           <span className="etiqueta">{ehAdmin ? 'Administrador' : 'Atendente'}</span>
         </span>
-        <button className="link" onClick={sair}>Sair</button>
       </header>
       <main className="conteudo">
         <Outlet />
       </main>
       <nav className="menu">
-        <NavLink to="/" end>Painel</NavLink>
-        {ehAdmin && <NavLink to="/usuarios">Usuários</NavLink>}
+        <NavLink to="/" end>
+          <span aria-hidden>▦</span>Painel
+        </NavLink>
+        <NavLink to="/emprestimos">
+          <span aria-hidden>☰</span>Empréstimos
+        </NavLink>
+        <NavLink to="/novo">
+          <span aria-hidden>＋</span>Novo
+        </NavLink>
+        <NavLink to="/mais">
+          <span aria-hidden>⋯</span>Mais
+        </NavLink>
       </nav>
     </div>
   );

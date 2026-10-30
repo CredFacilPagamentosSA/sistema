@@ -119,6 +119,19 @@ describe('Administrador e gestão de usuários', () => {
     ).rejects.toThrow(/Acesso negado/);
   });
 
+  it('cada usuário muda só o próprio nome', async () => {
+    await como(db, atendente);
+    await db.query(`select public.definir_meu_nome('  Maria Atendente  ')`);
+    await expect(db.query(`select public.definir_meu_nome('')`)).rejects.toThrow(/Informe seu nome/);
+    await comoSistema(db);
+    const r = await um<{ nome: string }>(db, `select nome from public.perfis where id = $1`, [atendente]);
+    expect(r.nome).toBe('Maria Atendente');
+    const dono = await um<{ nome: string }>(db, `select nome from public.perfis where id = $1`, [admin]);
+    expect(dono.nome).toBe('Dono');
+    await comoVisitante(db);
+    await expect(db.query(`select public.definir_meu_nome('Hacker')`)).rejects.toThrow(/permission denied/);
+  });
+
   it('com dois administradores, um pode virar atendente', async () => {
     const segundo = await criarUsuario(db, 'socio@credfacil.test');
     await como(db, admin);

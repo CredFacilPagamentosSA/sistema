@@ -165,3 +165,138 @@ input:focus, select:focus { outline: 2px solid var(--marca); outline-offset: 1px
 .acoes .botao { flex: 1; min-width: 140px; }
 
 .texto { max-width: 680px; margin: 0 auto; padding: 16px; }
+
+/* Menu de baixo com ícones */
+.menu a { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 0.78rem; }
+.menu a span { font-size: 1.25rem; line-height: 1; }
+
+/* Números do painel e do detalhe */
+.numeros { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 8px 0 16px; }
+.numero {
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--texto);
+  text-decoration: none;
+  min-width: 0;
+}
+.numero span { font-size: 0.8rem; color: var(--suave); }
+.numero strong { font-size: 1.2rem; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.numero small { color: var(--suave); }
+.numero.destaque { grid-column: 1 / -1; background: var(--marca); border-color: var(--marca); }
+.numero.destaque span, .numero.destaque strong { color: var(--marca-texto); }
+.numero.destaque strong { font-size: 1.6rem; }
+.numero.perigo { border-color: var(--perigo); }
+.numero.perigo strong { color: var(--perigo); }
+@media (min-width: 640px) { .numeros { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* Cartões de empréstimo */
+.lista li:has(> .cartao-emprestimo) { padding: 0; }
+.cartao-emprestimo { display: flex; flex-direction: column; gap: 6px; padding: 12px; color: var(--texto); text-decoration: none; }
+.linha { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.valor { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.risco { color: var(--alerta-texto); background: var(--alerta-fundo); border-radius: 8px; padding: 4px 8px; }
+
+/* Etiquetas de situação */
+.situacao { display: inline-block; font-size: 0.78rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+.situacao-atrasado { background: var(--perigo-fundo); color: var(--perigo); }
+.situacao-vence_hoje { background: #ffe1c7; color: #8a3b00; }
+.situacao-vence_em_breve { background: var(--alerta-fundo); color: var(--alerta-texto); }
+.situacao-em_dia { background: var(--sucesso-fundo); color: var(--sucesso-texto); }
+.situacao-quitado, .situacao-cancelado { background: var(--borda); color: var(--suave); }
+@media (prefers-color-scheme: dark) { .situacao-vence_hoje { background: #4a2608; color: #ffb877; } }
+.etiqueta.cinza { background: var(--borda); color: var(--suave); }
+
+/* Filtros e escolhas */
+input[type='search'] { margin-bottom: 10px; }
+.filtros, .escolha { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
+.filtros button, .escolha button {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 8px 14px;
+  min-height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--borda);
+  background: var(--superficie);
+  color: var(--texto);
+  cursor: pointer;
+}
+.filtros button.ativo, .escolha button.ativo { background: var(--marca); border-color: var(--marca); color: var(--marca-texto); }
+.escolha { margin-bottom: 4px; }
+.escolha button { flex: 1; }
+
+.titulo-com-acao { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.titulo-com-acao h1 { margin: 0; }
+.pequeno-botao { min-height: 40px; padding: 8px 14px; text-decoration: none; display: inline-flex; align-items: center; }
+.voltar { display: inline-block; margin-bottom: 8px; text-decoration: none; font-weight: 600; }
+
+/* Campos com R$ / % */
+.campo { display: flex; flex-direction: column; gap: 4px; font-weight: 600; font-size: 0.95rem; }
+.campo-titulo { display: flex; justify-content: space-between; align-items: center; }
+.campo-prefixo { display: flex; align-items: center; gap: 0; }
+.campo-prefixo > span {
+  padding: 12px 10px;
+  border: 1px solid var(--borda);
+  border-right: none;
+  border-radius: 10px 0 0 10px;
+  background: var(--superficie);
+  color: var(--suave);
+  font-weight: 600;
+  min-width: 44px;
+  text-align: center;
+}
+.campo-prefixo input { border-radius: 0 10px 10px 0; }
+.ajuda { font-weight: 400; font-size: 0.85rem; color: var(--suave); }
+.alternador { display: inline-flex; border: 1px solid var(--borda); border-radius: 8px; overflow: hidden; }
+.alternador button { font: inherit; font-size: 0.85rem; padding: 6px 12px; border: none; background: var(--superficie); color: var(--texto); cursor: pointer; }
+.alternador button.ativo { background: var(--marca); color: var(--marca-texto); }
+
+.resumo { background: var(--fundo); border: 1px dashed var(--borda); border-radius: 10px; padding: 10px 12px; margin: 0; }
+.alerta .botao { display: block; width: 100%; margin-top: 8px; }
+
+/* Ações do detalhe */
+.acoes-grandes { display: grid; gap: 8px; margin: 8px 0 16px; }
+.acoes-grandes .botao { display: flex; align-items: center; justify-content: center; text-decoration: none; }
+@media (min-width: 640px) { .acoes-grandes { grid-template-columns: repeat(2, 1fr); } }
+
+/* Histórico */
+.historico { list-style: none; padding: 0; margin: 0; border-left: 2px solid var(--borda); }
+.historico li { padding: 8px 0 12px 14px; position: relative; display: flex; flex-direction: column; gap: 2px; }
+.historico li::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 14px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--marca);
+}
+.historico li.desfeito strong, .historico li.desfeito .valor { text-decoration: line-through; color: var(--suave); }
+.historico li.desfeito::before { background: var(--borda); }
+
+/* Cobrança */
+.mensagem {
+  white-space: pre-wrap;
+  font-family: inherit;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 14px;
+  margin: 0 0 12px;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Menu "Mais" */
+.menu-lista { list-style: none; padding: 0; margin: 16px 0; background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); }
+.menu-lista li + li { border-top: 1px solid var(--borda); }
+.menu-lista a, .menu-lista button { display: block; width: 100%; text-align: left; padding: 14px 16px; text-decoration: none; color: var(--texto); font-size: 1rem; }
+.perigo-texto { color: var(--perigo) !important; }
+.passos li { margin-bottom: 8px; }

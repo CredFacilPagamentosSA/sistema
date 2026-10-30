@@ -19,6 +19,7 @@ type EstadoAuth = {
   // true quando a pessoa chegou por link de recuperação de senha ou convite
   precisaDefinirSenha: boolean;
   senhaDefinida: () => void;
+  recarregarPerfil: () => void;
   sair: () => Promise<void>;
 };
 
@@ -50,10 +51,11 @@ export function ProvedorAuth({ children }: { children: ReactNode }) {
   }, []);
 
   const usuarioId = sessao?.user.id;
+  const [versaoPerfil, setVersaoPerfil] = useState(0);
   useEffect(() => {
     if (!usuarioId) return;
     let cancelado = false;
-    setCarregando(true);
+    if (versaoPerfil === 0) setCarregando(true);
     supabase
       .from('perfis')
       .select('id, nome, email, perfil, ativo')
@@ -67,7 +69,7 @@ export function ProvedorAuth({ children }: { children: ReactNode }) {
     return () => {
       cancelado = true;
     };
-  }, [usuarioId]);
+  }, [usuarioId, versaoPerfil]);
 
   const valor: EstadoAuth = {
     carregando,
@@ -76,6 +78,7 @@ export function ProvedorAuth({ children }: { children: ReactNode }) {
     ehAdmin: perfil?.perfil === 'admin' && perfil.ativo,
     precisaDefinirSenha,
     senhaDefinida: () => setPrecisaDefinirSenha(false),
+    recarregarPerfil: () => setVersaoPerfil((v) => v + 1),
     sair: async () => {
       await supabase.auth.signOut();
     },
