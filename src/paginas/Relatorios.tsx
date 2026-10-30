@@ -40,6 +40,17 @@ function periodoPronto(id: string, hoje: string): [string, string] {
   }
 }
 
+// Período anterior para comparar: os mesmos meses antes (nos períodos prontos)
+// ou a mesma quantidade de dias imediatamente antes (nas datas escolhidas)
+function periodoAnterior(id: string, inicio: string, fim: string, hoje: string): [string, string] {
+  const mes = inicioDoMes(hoje);
+  const meses: Record<string, number> = { mes: 1, '3m': 3, '6m': 6, '12m': 12, ano: 12 };
+  if (id === 'mes_passado') return [somarMeses(mes, -2), somarDias(somarMeses(mes, -1), -1)];
+  if (meses[id]) return [somarMeses(inicio, -meses[id]), somarMeses(fim, -meses[id])];
+  const fimAnterior = somarDias(inicio, -1);
+  return [somarDias(fimAnterior, -diasEntre(inicio, fim)), fimAnterior];
+}
+
 const periodos = [
   { id: 'mes', nome: 'Este mês' },
   { id: 'mes_passado', nome: 'Mês passado' },
@@ -77,10 +88,7 @@ export function Relatorios() {
   const [fimOutro, setFimOutro] = useState(hoje);
   const [inicio, fim] = escolha === 'outro' ? [inicioOutro, fimOutro] : periodoPronto(escolha, hoje);
 
-  // Período anterior de mesmo tamanho, para comparar
-  const dias = diasEntre(inicio, fim);
-  const fimAnterior = somarDias(inicio, -1);
-  const inicioAnterior = somarDias(fimAnterior, -dias);
+  const [inicioAnterior, fimAnterior] = periodoAnterior(escolha, inicio, fim, hoje);
 
   const { dados, erro, carregando } = useCarregar(async () => {
     if (!inicio || !fim || fim < inicio) throw new Error('Período inválido: a data final precisa ser igual ou depois da inicial.');
