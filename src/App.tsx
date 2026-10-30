@@ -19,6 +19,7 @@ import { Mais } from './paginas/Mais';
 import { Instalar } from './paginas/Instalar';
 import { Relatorios } from './paginas/Relatorios';
 import { Clientes } from './paginas/Clientes';
+import { Backup } from './paginas/Backup';
 import { FichaCliente } from './paginas/FichaCliente';
 import { EditarCliente, NovoCliente } from './paginas/EditarCliente';
 import { Privacidade } from './paginas/Privacidade';
@@ -79,6 +80,7 @@ export function App() {
         <Route path="/mais" element={<Mais />} />
         <Route path="/usuarios" element={<SoAdmin><Usuarios /></SoAdmin>} />
         <Route path="/relatorios" element={<SoAdmin><Relatorios /></SoAdmin>} />
+        <Route path="/backup" element={<SoAdmin><Backup /></SoAdmin>} />
         <Route path="/privacidade" element={<Privacidade />} />
         <Route path="/instalar" element={<Instalar />} />
         <Route path="/definir-senha" element={<DefinirSenha />} />

@@ -1,0 +1,15 @@
+BACKUP DO SISTEMA DE EMPRÉSTIMOS
+=================================
+
+Este arquivo .zip contém uma cópia completa do banco de dados:
+
+  1-papeis.sql     permissões do banco
+  2-estrutura.sql  tabelas, regras e proteções
+  3-dados.sql      todos os dados (clientes, empréstimos, histórico e logins)
+  contagens.txt    quantos registros havia em cada tabela no momento do backup
+
+Estes arquivos servem para RESTAURAR o sistema, não para leitura.
+Para ler os dados em Excel ou PDF, use o botão "Backup e exportação" no app.
+
+Como restaurar: siga o guia docs/02-backup-e-restauracao.md do projeto.
+A restauração é feita sempre num projeto NOVO do Supabase; o atual nunca é sobrescrito.

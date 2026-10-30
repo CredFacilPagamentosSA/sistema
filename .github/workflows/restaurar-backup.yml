@@ -1,0 +1,57 @@
+# Restaura um backup num projeto NOVO e vazio do Supabase e confere se veio tudo.
+# Nunca restaura por cima do banco em uso (a rotina recusa).
+name: Restaurar backup
+
+on:
+  workflow_dispatch:
+    inputs:
+      data:
+        description: 'Data do backup (AAAA-MM-DD). Deixe em branco para usar o mais recente.'
+        required: false
+        default: ''
+      destino:
+        description: 'Onde restaurar: "teste" (projeto de teste) ou "novo_projeto" (recuperação de verdade)'
+        type: choice
+        options: [teste, novo_projeto]
+        default: teste
+      confirmacao:
+        description: 'Digite RESTAURAR para confirmar'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  restaurar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BACKUP_SENHA: ${{ secrets.BACKUP_SENHA }}
+      PRODUCAO_URL: ${{ secrets.SUPABASE_DB_URL }}
+      DESTINO_URL: ${{ inputs.destino == 'teste' && secrets.TESTE_DB_URL || secrets.NOVO_DB_URL }}
+      DATA_BACKUP: ${{ inputs.data }}
+      CONFIRMACAO: ${{ inputs.confirmacao }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Conferir confirmação e destino
+        run: |
+          if [ "$CONFIRMACAO" != "RESTAURAR" ]; then
+            echo "::error::Confirmação não digitada. Escreva RESTAURAR (em maiúsculas) para rodar."
+            exit 1
+          fi
+          if [ -z "$DESTINO_URL" ]; then
+            echo "::error::Falta o segredo do projeto de destino (TESTE_DB_URL ou NOVO_DB_URL)."
+            exit 1
+          fi
+          if [ "$DESTINO_URL" = "$PRODUCAO_URL" ]; then
+            echo "::error::O destino é o banco em uso. Por segurança, a restauração só é feita num projeto novo."
+            exit 1
+          fi
+
+      - name: Instalar ferramentas
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client p7zip-full jq > /dev/null
+
+      - name: Restaurar e conferir
+        run: bash scripts/backup/restaurar.sh

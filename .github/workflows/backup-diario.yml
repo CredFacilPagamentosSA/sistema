@@ -1,0 +1,67 @@
+# Backup diário: copia o banco inteiro, criptografa com a senha do backup,
+# guarda no GitHub (em "Releases" deste repositório privado) e envia por e-mail.
+name: Backup diário
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # 06:00 UTC = 03:00 em Brasília
+  workflow_dispatch: # permite rodar na hora, pelo botão "Run workflow"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      BACKUP_SENHA: ${{ secrets.BACKUP_SENHA }}
+      BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+      BACKUP_EMAIL_PARA: ${{ secrets.BACKUP_EMAIL_PARA }}
+      BACKUP_EMAIL_DE: ${{ secrets.BACKUP_EMAIL_DE }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Conferir configuração
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ] || [ -z "$BACKUP_SENHA" ]; then
+            echo "::error::Faltam os segredos SUPABASE_DB_URL e/ou BACKUP_SENHA (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Instalar ferramentas
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client p7zip-full jq > /dev/null
+
+      - name: Fazer backup criptografado
+        id: backup
+        run: bash scripts/backup/fazer-backup.sh
+
+      - name: Guardar no GitHub
+        run: bash scripts/backup/guardar.sh "${{ steps.backup.outputs.arquivo }}"
+
+      - name: Enviar por e-mail
+        run: bash scripts/backup/enviar-email.sh ok "${{ steps.backup.outputs.arquivo }}"
+
+      - name: Registrar no sistema
+        env:
+          RESUMO: ${{ steps.backup.outputs.resumo }}
+        run: |
+          psql "$SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 -v resumo="$RESUMO" \
+            -c "insert into public.backups (origem, sucesso, detalhe) values ('automatico', true, :'resumo')"
+
+      - name: Avisar falha
+        if: failure()
+        run: |
+          psql "$SUPABASE_DB_URL" -X -q \
+            -c "insert into public.backups (origem, sucesso, detalhe) values ('automatico', false, 'Falhou. Veja a aba Actions do GitHub.')" || true
+          bash scripts/backup/enviar-email.sh falha "" || true

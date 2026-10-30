@@ -1,0 +1,4 @@
+# Scripts que rodam no Linux do GitHub precisam de quebra de linha no padrão Linux
+*.sh text eol=lf
+*.yml text eol=lf
+*.sql text eol=lf
