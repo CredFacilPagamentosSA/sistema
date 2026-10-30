@@ -242,7 +242,7 @@ input[type='search'] { margin-bottom: 10px; }
 }
 .filtros button.ativo, .escolha button.ativo { background: var(--marca); border-color: var(--marca); color: var(--marca-texto); }
 .escolha { margin-bottom: 4px; }
-.escolha button { flex: 1; }
+.escolha button { flex: 1; min-width: 0; padding: 8px 6px; }
 
 .titulo-com-acao { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .titulo-com-acao h1 { margin: 0; }

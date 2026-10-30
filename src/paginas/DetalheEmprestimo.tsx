@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { supabase } from '../lib/supabase';
 import { mensagemDeErro } from '../lib/erros';
 import { consultar, useCarregar } from '../lib/useCarregar';
@@ -18,7 +18,9 @@ export async function buscarEmprestimo(id: string) {
 
 export function DetalheEmprestimo() {
   const { id = '' } = useParams();
-  const aviso = (useLocation().state as { aviso?: string } | null)?.aviso;
+  const local = useLocation();
+  const navegar = useNavigate();
+  const aviso = (local.state as { aviso?: string } | null)?.aviso;
   const { dados, erro, carregando, recarregar } = useCarregar(() => buscarEmprestimo(id), [id]);
   const [erroAcao, setErroAcao] = useState('');
   const [avisoAcao, setAvisoAcao] = useState('');
@@ -44,6 +46,8 @@ export function DetalheEmprestimo() {
     const { error } = await supabase.rpc('desfazer_ultimo', { p_emprestimo: e.id });
     setOcupado(false);
     if (error) return setErroAcao(mensagemDeErro(error));
+    // Tira o aviso da ação anterior (ex.: "Recebimento registrado") para não confundir
+    navegar(local.pathname, { replace: true, state: null });
     setAvisoAcao('Lançamento desfeito. O registro do "desfazer" ficou no histórico.');
     recarregar();
   }
