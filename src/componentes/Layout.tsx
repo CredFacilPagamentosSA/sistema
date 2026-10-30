@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router';
 import { useAuth } from '../lib/auth';
 import { NOME_EMPRESA } from '../marca';
+import { Icone } from './Icone';
 
 export function Layout() {
   const { perfil, ehAdmin } = useAuth();
@@ -18,19 +19,19 @@ export function Layout() {
       </main>
       <nav className="menu">
         <NavLink to="/" end>
-          <span aria-hidden>▦</span>Painel
+          <Icone nome="painel" />Painel
         </NavLink>
         <NavLink to="/emprestimos">
-          <span aria-hidden>☰</span>Empréstimos
+          <Icone nome="lista" />Empréstimos
         </NavLink>
         <NavLink to="/novo">
-          <span aria-hidden>＋</span>Novo
+          <Icone nome="mais" />Novo
         </NavLink>
         <NavLink to="/clientes">
-          <span aria-hidden>☺</span>Clientes
+          <Icone nome="pessoas" />Clientes
         </NavLink>
         <NavLink to="/mais">
-          <span aria-hidden>⋯</span>Mais
+          <Icone nome="pontos" />Mais
         </NavLink>
       </nav>
     </div>
