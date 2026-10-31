@@ -14,18 +14,33 @@ async function chamarFuncaoUsuarios(corpo: Record<string, unknown>) {
   if (data?.erro) throw new Error(data.erro);
 }
 
+// Senha provisória fácil de ditar: sem letras que se confundem (I/l, O/0), ex.: Kq7m-Pt4x
+export function gerarSenhaProvisoria(): string {
+  const maiusculas = 'ABCDEFGHJKMNPQRSTUVWXYZ';
+  const minusculas = 'abcdefghjkmnpqrstuvwxyz';
+  const numeros = '23456789';
+  const sorteio = new Uint32Array(8);
+  crypto.getRandomValues(sorteio);
+  const de = (lista: string, i: number) => lista[sorteio[i] % lista.length];
+  return `${de(maiusculas, 0)}${de(minusculas, 1)}${de(numeros, 2)}${de(minusculas, 3)}-${de(maiusculas, 4)}${de(minusculas, 5)}${de(numeros, 6)}${de(minusculas, 7)}`;
+}
+
+type Credencial = { nome: string; email: string; senha: string };
+
 export function Usuarios() {
   const { perfil: eu } = useAuth();
   const [usuarios, setUsuarios] = useState<Perfil[]>([]);
   const [erro, setErro] = useState('');
   const [aviso, setAviso] = useState('');
+  const [credencial, setCredencial] = useState<Credencial | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [perfilNovo, setPerfilNovo] = useState<'atendente' | 'admin'>('atendente');
+  const [senhaNova, setSenhaNova] = useState(gerarSenhaProvisoria);
 
   const carregar = useCallback(async () => {
-    const { data, error } = await supabase.from('perfis').select('id, nome, email, perfil, ativo').order('nome');
+    const { data, error } = await supabase.from('perfis').select('id, nome, email, perfil, ativo, precisa_trocar_senha').order('nome');
     if (error) setErro(mensagemDeErro(error));
     else setUsuarios(data as Perfil[]);
   }, []);
@@ -37,6 +52,7 @@ export function Usuarios() {
   async function executar(acao: () => Promise<void>, sucesso: string) {
     setErro('');
     setAviso('');
+    setCredencial(null);
     setOcupado(true);
     try {
       await acao();
@@ -49,14 +65,26 @@ export function Usuarios() {
     }
   }
 
-  function convidar(e: FormEvent) {
+  function criar(e: FormEvent) {
     e.preventDefault();
+    const dados = { nome: nome.trim(), email: email.trim().toLowerCase(), senha: senhaNova };
     executar(async () => {
-      await chamarFuncaoUsuarios({ acao: 'convidar', nome, email, perfil: perfilNovo });
+      await chamarFuncaoUsuarios({ acao: 'criar', ...dados, perfil: perfilNovo });
+      setCredencial(dados);
       setNome('');
       setEmail('');
       setPerfilNovo('atendente');
-    }, `Convite enviado para ${email}. A pessoa recebe um e-mail para criar a senha.`);
+      setSenhaNova(gerarSenhaProvisoria());
+    }, `Acesso criado para ${dados.nome}.`);
+  }
+
+  function redefinirSenha(u: Perfil) {
+    const senha = gerarSenhaProvisoria();
+    if (!confirm(`Criar uma nova senha provisória para ${u.nome || u.email}? A senha atual deixa de funcionar.`)) return;
+    executar(async () => {
+      await chamarFuncaoUsuarios({ acao: 'redefinir_senha', usuario: u.id, senha });
+      setCredencial({ nome: u.nome, email: u.email, senha });
+    }, 'Nova senha provisória criada.');
   }
 
   function alternarAtivo(u: Perfil) {
@@ -90,6 +118,18 @@ export function Usuarios() {
 
       {erro && <p className="erro" role="alert">{erro}</p>}
       {aviso && <p className="sucesso" role="status">{aviso}</p>}
+      {credencial && (
+        <div className="cartao credencial">
+          <strong>Passe estes dados para {credencial.nome || 'a pessoa'} (pessoalmente ou por mensagem):</strong>
+          <div>Endereço: <code>{window.location.origin}</code></div>
+          <div>E-mail: <code>{credencial.email}</code></div>
+          <div>Senha provisória: <code className="senha">{credencial.senha}</code></div>
+          <p className="suave pequeno">
+            No primeiro acesso, o app obriga a pessoa a criar a própria senha. Esta senha provisória não aparece de novo
+            depois que você sair desta tela.
+          </p>
+        </div>
+      )}
 
       <ul className="lista">
         {usuarios.map((u) => (
@@ -100,12 +140,18 @@ export function Usuarios() {
               <div className="suave pequeno">{u.email}</div>
               <div className="pequeno">
                 {u.perfil === 'admin' ? 'Administrador' : 'Atendente'} · {u.ativo ? 'Ativo' : 'Sem acesso'}
+                {u.ativo && u.precisa_trocar_senha && ' · aguardando primeiro acesso'}
               </div>
             </div>
             <div className="acoes">
               {u.ativo && (
                 <button className="botao secundario" disabled={ocupado} onClick={() => alternarPerfil(u)}>
                   {u.perfil === 'admin' ? 'Tornar atendente' : 'Tornar administrador'}
+                </button>
+              )}
+              {u.ativo && u.id !== eu?.id && (
+                <button className="botao secundario" disabled={ocupado} onClick={() => redefinirSenha(u)}>
+                  Nova senha provisória
                 </button>
               )}
               <button className={`botao ${u.ativo ? 'perigo' : 'secundario'}`} disabled={ocupado} onClick={() => alternarAtivo(u)}>
@@ -116,14 +162,14 @@ export function Usuarios() {
         ))}
       </ul>
 
-      <form className="cartao" onSubmit={convidar}>
+      <form className="cartao" onSubmit={criar}>
         <h2>Cadastrar novo acesso</h2>
         <label>
           Nome
           <input required value={nome} onChange={(e) => setNome(e.target.value)} />
         </label>
         <label>
-          E-mail
+          E-mail (será o login da pessoa)
           <input type="email" inputMode="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
         <label>
@@ -133,10 +179,18 @@ export function Usuarios() {
             <option value="admin">Administrador</option>
           </select>
         </label>
+        <div className="campo">
+          <span>Senha provisória</span>
+          <div className="linha">
+            <code className="senha">{senhaNova}</code>
+            <button type="button" className="link" onClick={() => setSenhaNova(gerarSenhaProvisoria())}>Gerar outra</button>
+          </div>
+        </div>
         <p className="suave pequeno">
-          Atendente registra empréstimos e recebimentos. Administrador também gerencia usuários, backup e exportação.
+          Atendente registra empréstimos e recebimentos. Administrador também cancela, gerencia usuários, backup e
+          relatórios.
         </p>
-        <button className="botao" disabled={ocupado}>Enviar convite</button>
+        <button className="botao" disabled={ocupado}>{ocupado ? 'Criando…' : 'Criar acesso'}</button>
       </form>
     </section>
   );

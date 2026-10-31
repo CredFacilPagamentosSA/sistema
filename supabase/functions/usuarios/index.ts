@@ -1,6 +1,8 @@
 // Função do Supabase (roda no servidor, nunca no celular).
-// Só ela usa a chave secreta, para convidar e bloquear logins.
+// Só ela usa a chave secreta, para criar logins, trocar senhas e bloquear acessos.
 // Antes de qualquer ação, confere se quem chamou é administrador ativo.
+// Não usa e-mail: o administrador cria o acesso com uma senha provisória
+// e a pessoa é obrigada a trocá-la no primeiro acesso.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const cabecalhos = {
@@ -13,17 +15,22 @@ function resposta(corpo: unknown, status = 200) {
   return new Response(JSON.stringify(corpo), { status, headers: cabecalhos });
 }
 
+// Mesma regra configurada no login: 8+ caracteres, minúscula, maiúscula e número
+function senhaValida(senha: string) {
+  return senha.length >= 8 && /[a-z]/.test(senha) && /[A-Z]/.test(senha) && /[0-9]/.test(senha);
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cabecalhos });
 
   const url = Deno.env.get('SUPABASE_URL')!;
   const chavePublica = Deno.env.get('SUPABASE_ANON_KEY')!;
   const chaveSecreta = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-  const site = Deno.env.get('SITE_URL') ?? '';
 
   // Cliente com as permissões de quem chamou: as regras do banco valem para ele
   const comoUsuario = createClient(url, chavePublica, {
     global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } },
+    auth: { persistSession: false },
   });
   const { data: ehAdmin, error: erroAdmin } = await comoUsuario.rpc('eh_admin');
   if (erroAdmin || ehAdmin !== true) {
@@ -38,23 +45,45 @@ Deno.serve(async (req) => {
     return resposta({ erro: 'Pedido inválido.' }, 400);
   }
 
-  if (corpo.acao === 'convidar') {
+  if (corpo.acao === 'criar') {
     const email = String(corpo.email ?? '').trim().toLowerCase();
     const nome = String(corpo.nome ?? '').trim();
+    const senha = String(corpo.senha ?? '');
     const perfil = corpo.perfil === 'admin' ? 'admin' : 'atendente';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !nome) {
       return resposta({ erro: 'Informe nome e e-mail válidos.' }, 400);
     }
-    const { data, error } = await sistema.auth.admin.inviteUserByEmail(email, {
-      data: { nome },
-      redirectTo: `${site}/definir-senha`,
+    if (!senhaValida(senha)) {
+      return resposta({ erro: 'A senha provisória precisa ter 8 caracteres, com minúscula, MAIÚSCULA e número.' }, 400);
+    }
+    const { data, error } = await sistema.auth.admin.createUser({
+      email,
+      password: senha,
+      email_confirm: true,
+      user_metadata: { nome },
     });
-    if (error) return resposta({ erro: error.message }, 400);
-    // O banco cria o perfil como atendente; promove se for administrador
+    if (error) {
+      const jaExiste = /already|registered|exists/i.test(error.message);
+      return resposta({ erro: jaExiste ? 'Já existe um acesso com este e-mail.' : error.message }, 400);
+    }
+    // O banco cria o perfil como atendente; marca a troca obrigatória e promove se for administrador
+    await sistema.from('perfis').update({ precisa_trocar_senha: true, nome }).eq('id', data.user.id);
     if (perfil === 'admin') {
       const { error: erroPerfil } = await comoUsuario.rpc('definir_perfil', { p_usuario: data.user.id, p_perfil: 'admin' });
       if (erroPerfil) return resposta({ erro: erroPerfil.message }, 400);
     }
+    return resposta({ ok: true });
+  }
+
+  if (corpo.acao === 'redefinir_senha') {
+    const usuario = String(corpo.usuario ?? '');
+    const senha = String(corpo.senha ?? '');
+    if (!senhaValida(senha)) {
+      return resposta({ erro: 'A senha provisória precisa ter 8 caracteres, com minúscula, MAIÚSCULA e número.' }, 400);
+    }
+    const { error } = await sistema.auth.admin.updateUserById(usuario, { password: senha });
+    if (error) return resposta({ erro: error.message }, 400);
+    await sistema.from('perfis').update({ precisa_trocar_senha: true }).eq('id', usuario);
     return resposta({ ok: true });
   }
 

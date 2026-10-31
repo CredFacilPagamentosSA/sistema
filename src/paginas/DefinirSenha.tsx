@@ -1,4 +1,4 @@
-// Usada no primeiro acesso (convite), na recuperação e para trocar a senha
+// Usada no primeiro acesso (senha provisória), na recuperação e para trocar a senha
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { supabase } from '../lib/supabase';
@@ -6,7 +6,8 @@ import { useAuth } from '../lib/auth';
 import { mensagemDeErro } from '../lib/erros';
 
 export function DefinirSenha() {
-  const { senhaDefinida } = useAuth();
+  const { senhaDefinida, perfil, recarregarPerfil } = useAuth();
+  const provisoria = !!perfil?.precisa_trocar_senha;
   const navegar = useNavigate();
   const [senha, setSenha] = useState('');
   const [confirmacao, setConfirmacao] = useState('');
@@ -25,6 +26,10 @@ export function DefinirSenha() {
     const { error } = await supabase.auth.updateUser({ password: senha });
     setEnviando(false);
     if (error) return setErro(mensagemDeErro(error));
+    if (provisoria) {
+      await supabase.rpc('marcar_senha_trocada');
+      recarregarPerfil();
+    }
     senhaDefinida();
     navegar('/', { replace: true });
   }
@@ -33,6 +38,11 @@ export function DefinirSenha() {
     <main className="centro">
       <form className="cartao" onSubmit={salvar}>
         <h1>Criar senha</h1>
+        {provisoria && (
+          <p className="alerta">
+            Você entrou com uma <strong>senha provisória</strong>. Crie agora a sua senha pessoal: só você vai saber.
+          </p>
+        )}
         <p className="suave">
           Use pelo menos 8 caracteres, com letra minúscula, letra MAIÚSCULA e número. Exemplo: Cafe2026Forte
         </p>

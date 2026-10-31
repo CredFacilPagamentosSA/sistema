@@ -367,3 +367,8 @@ textarea { font: inherit; resize: vertical; }
 .tabela th, .tabela td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--borda); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .tabela th:first-child, .tabela td:first-child { text-align: left; }
 .tabela th { color: var(--suave); font-weight: 600; position: sticky; top: 0; background: var(--superficie); }
+
+/* Senha provisória */
+.credencial { border-color: var(--marca); gap: 6px; }
+.credencial code, .senha { font-family: ui-monospace, Menlo, Consolas, monospace; background: var(--fundo); padding: 2px 6px; border-radius: 6px; overflow-wrap: anywhere; }
+.senha { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.04em; }

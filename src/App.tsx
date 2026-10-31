@@ -55,7 +55,7 @@ export function App() {
     );
   }
 
-  if (precisaDefinirSenha) {
+  if (precisaDefinirSenha || perfil?.precisa_trocar_senha) {
     return <DefinirSenha />;
   }
 

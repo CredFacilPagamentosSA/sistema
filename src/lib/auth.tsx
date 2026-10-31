@@ -9,6 +9,7 @@ export type Perfil = {
   email: string;
   perfil: 'admin' | 'atendente';
   ativo: boolean;
+  precisa_trocar_senha?: boolean;
 };
 
 type EstadoAuth = {
@@ -58,7 +59,7 @@ export function ProvedorAuth({ children }: { children: ReactNode }) {
     if (versaoPerfil === 0) setCarregando(true);
     supabase
       .from('perfis')
-      .select('id, nome, email, perfil, ativo')
+      .select('id, nome, email, perfil, ativo, precisa_trocar_senha')
       .eq('id', usuarioId)
       .maybeSingle()
       .then(({ data }) => {

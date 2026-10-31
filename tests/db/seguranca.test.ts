@@ -132,6 +132,24 @@ describe('Administrador e gestão de usuários', () => {
     await expect(db.query(`select public.definir_meu_nome('Hacker')`)).rejects.toThrow(/permission denied/);
   });
 
+  it('quem tem senha provisória só desmarca a própria troca', async () => {
+    await comoSistema(db);
+    await db.query(`update public.perfis set precisa_trocar_senha = true where id in ($1, $2)`, [atendente, admin]);
+    await como(db, atendente);
+    await db.query(`select public.marcar_senha_trocada()`);
+    await comoSistema(db);
+    const r = await db.query<{ id: string; precisa_trocar_senha: boolean }>(
+      `select id, precisa_trocar_senha from public.perfis where id in ($1, $2)`,
+      [atendente, admin],
+    );
+    const porId = Object.fromEntries(r.rows.map((x) => [x.id, x.precisa_trocar_senha]));
+    expect(porId[atendente]).toBe(false);
+    expect(porId[admin]).toBe(true);
+    await db.query(`update public.perfis set precisa_trocar_senha = false where id = $1`, [admin]);
+    await comoVisitante(db);
+    await expect(db.query(`select public.marcar_senha_trocada()`)).rejects.toThrow(/permission denied/);
+  });
+
   it('com dois administradores, um pode virar atendente', async () => {
     const segundo = await criarUsuario(db, 'socio@credfacil.test');
     await como(db, admin);
