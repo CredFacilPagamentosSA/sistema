@@ -31,13 +31,29 @@ if [ "$(psql "$DESTINO_URL" -X -A -t -c "select to_regclass('public.emprestimos'
   exit 1
 fi
 
+# Dos dados, restaura só os do sistema (public) e os logins (auth). As outras áreas
+# (armazenamento de arquivos, tempo real...) são internas do Supabase, já vêm prontas
+# em todo projeto novo e só a própria Supabase pode gravar nelas.
+awk '
+  /^COPY / {
+    esquema = $2; gsub(/"/, "", esquema); sub(/\..*/, "", esquema)
+    pular = (esquema != "public" && esquema != "auth")
+  }
+  /^SELECT pg_catalog\.setval\(/ {
+    esquema = $0; sub(/^SELECT pg_catalog\.setval\(\x27"?/, "", esquema); sub(/["\.].*/, "", esquema)
+    if (esquema != "public" && esquema != "auth") next
+  }
+  !pular { print }
+  pular && /^\\\.$/ { pular = 0 }
+' backup/3-dados.sql > backup/3-dados-sistema.sql
+
 # 4. Restaurar tudo de uma vez (se algo falhar, nada fica pela metade).
 # O 1-papeis.sql fica só como registro: o sistema não cria papéis próprios, usa os que
 # o Supabase já traz em todo projeto novo, e alguns ajustes desses papéis só a Supabase pode fazer.
 psql "$DESTINO_URL" -X -q --single-transaction -v ON_ERROR_STOP=1 \
   -f backup/2-estrutura.sql \
   -c 'SET session_replication_role = replica' \
-  -f backup/3-dados.sql \
+  -f backup/3-dados-sistema.sql \
   -c 'SET session_replication_role = origin' \
   -f scripts/backup/pos-restauracao.sql
 
