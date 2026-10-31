@@ -31,9 +31,10 @@ if [ "$(psql "$DESTINO_URL" -X -A -t -c "select to_regclass('public.emprestimos'
   exit 1
 fi
 
-# 4. Restaurar tudo de uma vez (se algo falhar, nada fica pela metade)
+# 4. Restaurar tudo de uma vez (se algo falhar, nada fica pela metade).
+# O 1-papeis.sql fica só como registro: o sistema não cria papéis próprios, usa os que
+# o Supabase já traz em todo projeto novo, e alguns ajustes desses papéis só a Supabase pode fazer.
 psql "$DESTINO_URL" -X -q --single-transaction -v ON_ERROR_STOP=1 \
-  -f backup/1-papeis.sql \
   -f backup/2-estrutura.sql \
   -c 'SET session_replication_role = replica' \
   -f backup/3-dados.sql \
