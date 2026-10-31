@@ -15,6 +15,17 @@ function resposta(corpo: unknown, status = 200) {
   return new Response(JSON.stringify(corpo), { status, headers: cabecalhos });
 }
 
+// Projetos com o formato novo de chaves recebem uma lista (JSON) em vez de uma chave só
+function primeiraChave(nome: string): string {
+  const valor = Deno.env.get(nome) ?? '';
+  try {
+    const lista = JSON.parse(valor);
+    return String(Object.values(lista)[0] ?? '');
+  } catch {
+    return valor;
+  }
+}
+
 // Mesma regra configurada no login: 8+ caracteres, minúscula, maiúscula e número
 function senhaValida(senha: string) {
   return senha.length >= 8 && /[a-z]/.test(senha) && /[A-Z]/.test(senha) && /[0-9]/.test(senha);
@@ -24,8 +35,11 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cabecalhos });
 
   const url = Deno.env.get('SUPABASE_URL')!;
-  const chavePublica = Deno.env.get('SUPABASE_ANON_KEY')!;
-  const chaveSecreta = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  const chavePublica = Deno.env.get('SUPABASE_ANON_KEY') || primeiraChave('SUPABASE_PUBLISHABLE_KEYS');
+  const chaveSecreta = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || primeiraChave('SUPABASE_SECRET_KEYS');
+  if (!url || !chavePublica || !chaveSecreta) {
+    return resposta({ erro: 'A função não encontrou as chaves do projeto. Fale com o suporte técnico.' }, 500);
+  }
 
   // Cliente com as permissões de quem chamou: as regras do banco valem para ele
   const comoUsuario = createClient(url, chavePublica, {
