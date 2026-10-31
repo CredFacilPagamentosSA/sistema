@@ -55,9 +55,10 @@ jobs:
       - name: Registrar no sistema
         env:
           RESUMO: ${{ steps.backup.outputs.resumo }}
+        # O psql só troca :'resumo' pelo valor quando o comando vem pela entrada (não com -c)
         run: |
-          psql "$SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 -v resumo="$RESUMO" \
-            -c "insert into public.backups (origem, sucesso, detalhe) values ('automatico', true, :'resumo')"
+          echo "insert into public.backups (origem, sucesso, detalhe) values ('automatico', true, :'resumo');" \
+            | psql "$SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 -v resumo="$RESUMO"
 
       - name: Avisar falha
         if: failure()
