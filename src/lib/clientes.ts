@@ -16,6 +16,7 @@ export type Cliente = {
   observacoes: string | null;
   criado_em: string;
   atualizado_em: string | null;
+  arquivado_em: string | null;
 };
 
 // Campos do formulário (tudo texto, como digitado)

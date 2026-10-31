@@ -2,7 +2,7 @@ import { formatarReais } from './dinheiro';
 import { formatarData, formatarDataHora } from './datas';
 
 export type Situacao = 'em_dia' | 'vence_em_breve' | 'vence_hoje' | 'atrasado' | 'quitado' | 'cancelado';
-export type TipoLancamento = 'criacao' | 'juros' | 'parcial' | 'quitacao' | 'edicao' | 'desfazer';
+export type TipoLancamento = 'criacao' | 'juros' | 'parcial' | 'quitacao' | 'edicao' | 'desfazer' | 'cancelamento';
 
 // Uma linha da visão v_emprestimos (valores em centavos)
 export type Emprestimo = {
@@ -48,6 +48,7 @@ export const nomesTipo: Record<TipoLancamento, string> = {
   quitacao: 'Quitação',
   edicao: 'Dados editados',
   desfazer: 'Desfeito',
+  cancelamento: 'Empréstimo cancelado',
 };
 
 export function textoSituacao(e: Pick<Emprestimo, 'situacao' | 'dias_para_vencer'>): string {

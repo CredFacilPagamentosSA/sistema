@@ -7,6 +7,7 @@ import { formatarReais } from '../lib/dinheiro';
 import { formatarData, formatarDataHora } from '../lib/datas';
 import { descreverLancamento, formatarWhatsapp, ultimoDesfazivel, type Emprestimo, type Lancamento } from '../lib/emprestimos';
 import { EtiquetaSituacao } from '../componentes/CartaoEmprestimo';
+import { useAuth } from '../lib/auth';
 
 export async function buscarEmprestimo(id: string) {
   const [emprestimo, historico] = await Promise.all([
@@ -25,13 +26,32 @@ export function DetalheEmprestimo() {
   const [erroAcao, setErroAcao] = useState('');
   const [avisoAcao, setAvisoAcao] = useState('');
   const [ocupado, setOcupado] = useState(false);
+  const { ehAdmin } = useAuth();
 
   if (carregando) return <p className="suave">Carregando…</p>;
   if (erro || !dados) return <p className="erro">{erro || 'Empréstimo não encontrado.'}</p>;
 
   const { emprestimo: e, historico } = dados;
   const aberto = e.estado === 'aberto';
-  const alvoDesfazer = ultimoDesfazivel(historico);
+  const ultimo = ultimoDesfazivel(historico);
+  // Desfazer um cancelamento é só para administradores
+  const alvoDesfazer = ultimo?.tipo === 'cancelamento' && !ehAdmin ? undefined : ultimo;
+
+  async function cancelar() {
+    const motivo = prompt(
+      'Cancelar este empréstimo lançado por engano?\n\nEle e todos os recebimentos dele saem do Painel e dos Relatórios. Nada é apagado: fica no histórico e pode ser desfeito.\n\nEscreva o motivo:',
+    );
+    if (motivo === null) return;
+    setErroAcao('');
+    setAvisoAcao('');
+    setOcupado(true);
+    const { error } = await supabase.rpc('cancelar_emprestimo', { p_emprestimo: e.id, p_motivo: motivo });
+    setOcupado(false);
+    if (error) return setErroAcao(mensagemDeErro(error));
+    navegar(local.pathname, { replace: true, state: null });
+    setAvisoAcao('Empréstimo cancelado. Ele não entra mais no Painel nem nos Relatórios.');
+    recarregar();
+  }
 
   async function desfazer() {
     if (!alvoDesfazer) return;
@@ -66,6 +86,12 @@ export function DetalheEmprestimo() {
       {aviso && <p className="sucesso" role="status">{aviso}</p>}
       {avisoAcao && <p className="sucesso" role="status">{avisoAcao}</p>}
       {erroAcao && <p className="erro" role="alert">{erroAcao}</p>}
+      {e.estado === 'cancelado' && (
+        <p className="alerta">
+          <strong>Empréstimo cancelado.</strong> Ele e os recebimentos dele não entram no Painel nem nos Relatórios. O
+          histórico continua guardado abaixo.
+        </p>
+      )}
       {e.alerta_risco && (
         <p className="alerta">
           <strong>Alerta de risco:</strong> {e.renovacoes_so_juros_seguidas} renovações seguidas pagando só os juros.
@@ -120,7 +146,12 @@ export function DetalheEmprestimo() {
         )}
         {alvoDesfazer && (
           <button className="botao perigo" disabled={ocupado} onClick={desfazer}>
-            Desfazer último lançamento
+            {alvoDesfazer.tipo === 'cancelamento' ? 'Desfazer o cancelamento' : 'Desfazer último lançamento'}
+          </button>
+        )}
+        {ehAdmin && e.estado !== 'cancelado' && (
+          <button className="botao perigo" disabled={ocupado} onClick={cancelar}>
+            Cancelar (lançado por engano)
           </button>
         )}
       </div>

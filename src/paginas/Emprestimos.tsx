@@ -11,6 +11,7 @@ const filtros = [
   { id: 'hoje', nome: 'Hoje', aceita: (e: Emprestimo) => e.situacao === 'vence_hoje' },
   { id: 'em_dia', nome: 'Em dia', aceita: (e: Emprestimo) => e.situacao === 'em_dia' || e.situacao === 'vence_em_breve' },
   { id: 'quitados', nome: 'Quitados', aceita: (e: Emprestimo) => e.situacao === 'quitado' },
+  { id: 'cancelados', nome: 'Cancelados', aceita: (e: Emprestimo) => e.situacao === 'cancelado' },
 ];
 
 // Busca sem diferenciar maiúsculas e acentos: "joao" encontra "João"

@@ -13,6 +13,7 @@ function simplificar(texto: string) {
 
 export function Clientes() {
   const [busca, setBusca] = useState('');
+  const [verArquivados, setVerArquivados] = useState(false);
   const { dados, erro, carregando } = useCarregar(async () => {
     const [clientes, abertos] = await Promise.all([
       consultar<Cliente[]>(supabase.from('clientes').select('*').order('nome')),
@@ -25,11 +26,13 @@ export function Clientes() {
 
   const termo = simplificar(busca.trim());
   const numeros = soNumeros(busca);
+  const arquivados = (dados ?? []).filter((c) => c.arquivado_em).length;
   const lista = (dados ?? []).filter(
     (c: ClienteComContagem) =>
-      !termo ||
-      simplificar(c.nome).includes(termo) ||
-      (numeros.length >= 3 && ((c.cpf ?? '').includes(numeros) || c.whatsapp.includes(numeros))),
+      !!c.arquivado_em === verArquivados &&
+      (!termo ||
+        simplificar(c.nome).includes(termo) ||
+        (numeros.length >= 3 && ((c.cpf ?? '').includes(numeros) || c.whatsapp.includes(numeros)))),
   );
 
   return (
@@ -39,6 +42,16 @@ export function Clientes() {
         <Link to="/clientes/novo" className="botao pequeno-botao">+ Cliente</Link>
       </div>
       <input type="search" placeholder="Buscar por nome, CPF ou telefone" value={busca} onChange={(e) => setBusca(e.target.value)} aria-label="Buscar cliente" />
+      {(arquivados > 0 || verArquivados) && (
+        <div className="filtros" role="tablist">
+          <button role="tab" aria-selected={!verArquivados} className={!verArquivados ? 'ativo' : ''} onClick={() => setVerArquivados(false)}>
+            Ativos
+          </button>
+          <button role="tab" aria-selected={verArquivados} className={verArquivados ? 'ativo' : ''} onClick={() => setVerArquivados(true)}>
+            Arquivados ({arquivados})
+          </button>
+        </div>
+      )}
 
       {carregando && <p className="suave">Carregando…</p>}
       {erro && <p className="erro">{erro}</p>}

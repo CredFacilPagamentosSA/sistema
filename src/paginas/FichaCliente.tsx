@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../lib/auth';
+import { mensagemDeErro } from '../lib/erros';
 import { consultar, useCarregar } from '../lib/useCarregar';
 import { cadastroIncompleto, enderecoEmUmaLinha, formatarCpf, type Cliente } from '../lib/clientes';
 import { formatarWhatsapp, type Emprestimo } from '../lib/emprestimos';
@@ -22,6 +25,7 @@ const nomesCampos: Partial<Record<keyof Cliente, string>> = {
   cidade: 'Cidade',
   uf: 'UF',
   observacoes: 'Observações',
+  arquivado_em: 'Arquivamento',
 };
 
 export async function buscarCliente(id: string) {
@@ -43,12 +47,26 @@ function camposAlterados(antes: Partial<Cliente>, depois: Partial<Cliente>): str
 export function FichaCliente() {
   const { id = '' } = useParams();
   const aviso = (useLocation().state as { aviso?: string } | null)?.aviso;
-  const { dados, erro, carregando } = useCarregar(() => buscarCliente(id), [id]);
+  const { dados, erro, carregando, recarregar } = useCarregar(() => buscarCliente(id), [id]);
+  const { ehAdmin } = useAuth();
+  const [erroAcao, setErroAcao] = useState('');
 
   if (carregando) return <p className="suave">Carregando…</p>;
   if (erro || !dados) return <p className="erro">{erro || 'Cliente não encontrado.'}</p>;
 
   const { cliente: c, emprestimos, historico } = dados;
+
+  async function arquivar(arquivar: boolean) {
+    if (
+      arquivar &&
+      !confirm(`Arquivar ${c.nome}? O cliente sai das listas e das buscas, mas nada é apagado. Dá para reativar depois.`)
+    )
+      return;
+    setErroAcao('');
+    const { error } = await supabase.rpc('arquivar_cliente', { p_cliente: c.id, p_arquivar: arquivar });
+    if (error) return setErroAcao(mensagemDeErro(error));
+    recarregar();
+  }
   // Para cada alteração, a versão "depois" é a próxima foto do histórico (ou o cadastro atual)
   const versoes: Partial<Cliente>[] = [c, ...historico.map((h) => h.dados_anteriores)];
 
@@ -57,7 +75,13 @@ export function FichaCliente() {
       <Link to="/clientes" className="voltar">‹ Clientes</Link>
       <h1>{c.nome}</h1>
       {aviso && <p className="sucesso" role="status">{aviso}</p>}
-      {cadastroIncompleto(c) && (
+      {erroAcao && <p className="erro" role="alert">{erroAcao}</p>}
+      {c.arquivado_em && (
+        <p className="alerta">
+          <strong>Cliente arquivado</strong> em {formatarDataHora(c.arquivado_em)}. Ele não aparece nas listas nem nas buscas.
+        </p>
+      )}
+      {cadastroIncompleto(c) && !c.arquivado_em && (
         <p className="alerta">
           <strong>Cadastro incompleto.</strong> Faltam CPF ou endereço. <Link to={`/clientes/${c.id}/editar`}>Completar agora</Link>
         </p>
@@ -74,8 +98,14 @@ export function FichaCliente() {
       </dl>
 
       <div className="acoes-grandes">
-        <Link to={`/novo?cliente=${c.id}`} className="botao">Novo empréstimo para este cliente</Link>
+        {!c.arquivado_em && <Link to={`/novo?cliente=${c.id}`} className="botao">Novo empréstimo para este cliente</Link>}
         <Link to={`/clientes/${c.id}/editar`} className="botao secundario">Editar cadastro</Link>
+        {ehAdmin &&
+          (c.arquivado_em ? (
+            <button className="botao secundario" onClick={() => arquivar(false)}>Reativar cliente</button>
+          ) : (
+            <button className="botao perigo" onClick={() => arquivar(true)}>Arquivar cliente</button>
+          ))}
       </div>
 
       <h2>Empréstimos</h2>

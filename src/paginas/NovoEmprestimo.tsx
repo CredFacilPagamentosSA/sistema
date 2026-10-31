@@ -51,6 +51,7 @@ export function NovoEmprestimo() {
   const numeros = soNumeros(busca);
   const encontrados = termo
     ? clientes
+        .filter((c) => !c.arquivado_em)
         .filter((c) => simplificar(c.nome).includes(termo) || (numeros.length >= 3 && ((c.cpf ?? '').includes(numeros) || c.whatsapp.includes(numeros))))
         .slice(0, 8)
     : [];
