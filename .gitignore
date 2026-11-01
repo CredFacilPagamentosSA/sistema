@@ -6,3 +6,6 @@ dist/
 *.log
 backups-locais/
 .claude/settings.local.json
+
+# Lista de contas: fica só no computador (decisão do dono)
+docs/05-contas-e-acessos.md
