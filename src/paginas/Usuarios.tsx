@@ -40,7 +40,7 @@ export function Usuarios() {
   const [senhaNova, setSenhaNova] = useState(gerarSenhaProvisoria);
 
   const carregar = useCallback(async () => {
-    const { data, error } = await supabase.from('perfis').select('id, nome, email, perfil, ativo, precisa_trocar_senha').order('nome');
+    const { data, error } = await supabase.from('perfis').select('id, nome, email, perfil, ativo, precisa_trocar_senha, dono').order('nome');
     if (error) setErro(mensagemDeErro(error));
     else setUsuarios(data as Perfil[]);
   }, []);
@@ -136,13 +136,18 @@ export function Usuarios() {
           <li key={u.id} className={u.ativo ? '' : 'inativo'}>
             <div>
               <strong>{u.nome || '(sem nome)'}</strong>
+              {u.dono && <span className="etiqueta">Dono</span>}
               {u.id === eu?.id && <span className="etiqueta">Você</span>}
               <div className="suave pequeno">{u.email}</div>
               <div className="pequeno">
                 {u.perfil === 'admin' ? 'Administrador' : 'Atendente'} · {u.ativo ? 'Ativo' : 'Sem acesso'}
                 {u.ativo && u.precisa_trocar_senha && ' · aguardando primeiro acesso'}
               </div>
+              {u.dono && (
+                <div className="suave pequeno">Protegido: o acesso, o perfil e a senha do Dono não podem ser alterados por aqui.</div>
+              )}
             </div>
+            {!u.dono && (
             <div className="acoes">
               {u.ativo && (
                 <button className="botao secundario" disabled={ocupado} onClick={() => alternarPerfil(u)}>
@@ -158,6 +163,7 @@ export function Usuarios() {
                 {u.ativo ? 'Remover acesso' : 'Reativar'}
               </button>
             </div>
+            )}
           </li>
         ))}
       </ul>

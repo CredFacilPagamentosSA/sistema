@@ -102,9 +102,10 @@ describe('Ninguém apaga histórico, nem o administrador nem o sistema', () => {
 
 describe('Administrador e gestão de usuários', () => {
   it('não deixa o sistema sem administrador', async () => {
+    // O único administrador aqui também é o Dono: a recusa pode vir por qualquer das duas regras
     await como(db, admin);
-    await expect(db.query(`select public.definir_ativo($1, false)`, [admin])).rejects.toThrow(/pelo menos um administrador/);
-    await expect(db.query(`select public.definir_perfil($1, 'atendente')`, [admin])).rejects.toThrow(/pelo menos um administrador/);
+    await expect(db.query(`select public.definir_ativo($1, false)`, [admin])).rejects.toThrow(/pelo menos um administrador|Dono/);
+    await expect(db.query(`select public.definir_perfil($1, 'atendente')`, [admin])).rejects.toThrow(/pelo menos um administrador|Dono/);
   });
 
   it('usuário desativado perde o acesso na hora', async () => {

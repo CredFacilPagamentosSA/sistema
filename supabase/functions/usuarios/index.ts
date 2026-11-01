@@ -95,6 +95,12 @@ Deno.serve(async (req) => {
     if (!senhaValida(senha)) {
       return resposta({ erro: 'A senha provisória precisa ter 8 caracteres, com minúscula, MAIÚSCULA e número.' }, 400);
     }
+    // A senha do Dono do sistema não pode ser trocada por outro administrador
+    const { data: alvo } = await sistema.from('perfis').select('dono').eq('id', usuario).maybeSingle();
+    if (!alvo) return resposta({ erro: 'Usuário não encontrado.' }, 404);
+    if (alvo.dono) {
+      return resposta({ erro: 'Não é possível: a senha do Dono do sistema não pode ser trocada por aqui.' }, 403);
+    }
     const { error } = await sistema.auth.admin.updateUserById(usuario, { password: senha });
     if (error) return resposta({ erro: error.message }, 400);
     await sistema.from('perfis').update({ precisa_trocar_senha: true }).eq('id', usuario);
