@@ -5,14 +5,14 @@
   --texto: #18201c;
   --suave: #5d6b64;
   --borda: #dfe5e2;
-  --marca: #0f5132;
+  --marca: #084c3f;
   --marca-texto: #ffffff;
   --perigo: #b42318;
   --perigo-fundo: #fdecea;
   --alerta-fundo: #fff4d6;
   --alerta-texto: #6b4a00;
   --sucesso-fundo: #e5f4ec;
-  --sucesso-texto: #0f5132;
+  --sucesso-texto: #084c3f;
   --raio: 12px;
   /* Cores dos gráficos (validadas para daltonismo contra o fundo claro e o escuro) */
   --serie-1: #2a78d6;
@@ -30,8 +30,8 @@
     --texto: #e8eeeb;
     --suave: #9aa8a1;
     --borda: #2b3531;
-    --marca: #3fb47c;
-    --marca-texto: #08130d;
+    --marca: #2ab083;
+    --marca-texto: #04221b;
     --perigo: #ff8a80;
     --perigo-fundo: #3a1714;
     --alerta-fundo: #3a2e0c;
@@ -372,3 +372,9 @@ textarea { font: inherit; resize: vertical; }
 .credencial { border-color: var(--marca); gap: 6px; }
 .credencial code, .senha { font-family: ui-monospace, Menlo, Consolas, monospace; background: var(--fundo); padding: 2px 6px; border-radius: 6px; overflow-wrap: anywhere; }
 .senha { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.04em; }
+
+/* Logotipo */
+.logo-caixa { margin: 0 0 4px; background: #ffffff; border-radius: 10px; padding: 10px 12px; line-height: 0; }
+.logo-caixa img { width: 100%; height: auto; display: block; }
+.topo-marca { display: inline-flex; align-items: center; gap: 8px; }
+.topo-marca img { border-radius: 7px; background: #ffffff; flex: none; }

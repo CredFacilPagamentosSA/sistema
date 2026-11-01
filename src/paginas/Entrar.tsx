@@ -22,7 +22,9 @@ export function Entrar() {
   return (
     <main className="centro">
       <form className="cartao" onSubmit={entrar}>
-        <h1>{NOME_EMPRESA}</h1>
+        <h1 className="logo-caixa">
+          <img src="/marca/logo-horizontal.png" alt={NOME_EMPRESA} width="900" height="241" />
+        </h1>
         <p className="suave">Entre com seu e-mail e senha.</p>
         <label>
           E-mail

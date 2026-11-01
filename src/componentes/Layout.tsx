@@ -8,7 +8,10 @@ export function Layout() {
   return (
     <div className="app">
       <header className="topo">
-        <strong>{NOME_EMPRESA}</strong>
+        <strong className="topo-marca">
+          <img src="/marca/simbolo.png" alt="" width="28" height="28" />
+          {NOME_EMPRESA}
+        </strong>
         <span className="topo-usuario">
           {perfil?.nome || perfil?.email}
           <span className="etiqueta">{ehAdmin ? 'Administrador' : 'Atendente'}</span>
