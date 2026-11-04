@@ -1,0 +1,28 @@
+{
+  "nome": "iMusic",
+  "cor": "#0b2545",
+  "cadastroSimples": true,
+  "empresaNaCobranca": false,
+  "privacidadeNaEntrada": false,
+  "tema": {
+    "claro": {
+      "fundo": "#f2f7fb",
+      "borda": "#d9e5ef",
+      "suave": "#536579",
+      "marca": "#0b2545",
+      "marca-texto": "#ffffff",
+      "sucesso-fundo": "#e2f1fb",
+      "sucesso-texto": "#0b2545"
+    },
+    "escuro": {
+      "fundo": "#081423",
+      "superficie": "#102036",
+      "borda": "#233750",
+      "suave": "#9fb3c8",
+      "marca": "#7cc4f0",
+      "marca-texto": "#06182e",
+      "sucesso-fundo": "#14304d",
+      "sucesso-texto": "#a9d8f5"
+    }
+  }
+}

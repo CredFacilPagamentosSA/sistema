@@ -32,8 +32,8 @@ function montarTabelas(d: Exportacao) {
   return [
     {
       nome: 'Clientes',
-      colunas: ['Nome', 'CPF', 'WhatsApp', 'Nascimento', 'E-mail', 'Endereço', 'Observações', 'Cliente desde'],
-      larguras: [28, 16, 18, 12, 28, 60, 40, 18],
+      colunas: ['Nome', 'CPF', 'WhatsApp', 'Nascimento', 'E-mail', 'Endereço', 'Indicado por', 'Observações', 'Cliente desde'],
+      larguras: [28, 16, 18, 12, 28, 60, 24, 40, 18],
       linhas: d.clientes.map((c) => [
         c.nome,
         c.cpf ? formatarCpf(c.cpf) : '',
@@ -41,6 +41,7 @@ function montarTabelas(d: Exportacao) {
         c.data_nascimento ? formatarData(c.data_nascimento) : '',
         c.email ?? '',
         enderecoEmUmaLinha(c),
+        c.indicacao ?? '',
         c.observacoes ?? '',
         formatarDataHora(c.criado_em),
       ]),

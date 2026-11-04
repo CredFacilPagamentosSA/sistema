@@ -9,7 +9,7 @@ export function Privacidade() {
 
       <h2>Quais dados guardamos</h2>
       <p>
-        De cada cliente: <strong>nome, CPF, data de nascimento, WhatsApp, e-mail e endereço</strong>, além de
+        De cada cliente, quando informados: <strong>nome, CPF, data de nascimento, WhatsApp, e-mail, endereço e quem indicou</strong>, além de
         observações sobre o atendimento e dos valores, datas e pagamentos dos empréstimos. Dos usuários do sistema:
         nome, e-mail e o registro das ações que cada um fez.
       </p>

@@ -9,3 +9,6 @@ backups-locais/
 
 # Lista de contas: fica só no computador (decisão do dono)
 docs/05-contas-e-acessos.md
+
+# Pacotes de entrega para clientes
+entregas/

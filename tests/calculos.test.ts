@@ -2,7 +2,10 @@
 import { describe, expect, it } from 'vitest';
 import { calcularJuros, formatarParaCampo, formatarReais, jurosPorPercentual, lerPercentual, lerReais } from '../src/lib/dinheiro';
 import { diasEntre, formatarData, hojeSP, somarDias, somarMeses } from '../src/lib/datas';
-import { cpfValido, formatarCep, formatarCpf } from '../src/lib/clientes';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { clienteVazio, cpfValido, formatarCep, formatarCpf, problemaNoCadastro } from '../src/lib/clientes';
+import { FormCliente } from '../src/componentes/FormCliente';
 
 describe('CPF e CEP na tela', () => {
   it('confere os dígitos do CPF igual ao banco', () => {
@@ -92,5 +95,56 @@ describe('Datas (horário de Brasília)', () => {
 
   it('formata no padrão brasileiro', () => {
     expect(formatarData('2026-11-03')).toBe('03/11/2026');
+  });
+});
+
+describe('Cadastro simples e completo', () => {
+  const basico = { ...clienteVazio, nome: 'Maria', whatsapp: '(24) 99999-0000' };
+  const endereco = { cep: '01310-100', logradouro: 'Av. Paulista', numero: '1000', bairro: 'Bela Vista', cidade: 'São Paulo', uf: 'SP' };
+
+  it('simples: só nome e WhatsApp são obrigatórios', () => {
+    expect(problemaNoCadastro(basico, true)).toBeNull();
+    expect(problemaNoCadastro({ ...basico, indicacao: 'Seu Antônio' }, true)).toBeNull();
+    expect(problemaNoCadastro({ ...basico, nome: ' ' }, true)).toMatch(/nome/);
+    expect(problemaNoCadastro({ ...basico, whatsapp: '123' }, true)).toMatch(/WhatsApp/);
+  });
+
+  it('simples: o que for preenchido a mais continua sendo conferido', () => {
+    expect(problemaNoCadastro({ ...basico, cpf: '123.456.789-00' }, true)).toMatch(/CPF inválido/);
+    expect(problemaNoCadastro({ ...basico, email: 'sem-arroba' }, true)).toMatch(/E-mail/);
+    expect(problemaNoCadastro({ ...basico, cep: '123' }, true)).toMatch(/CEP/);
+    expect(problemaNoCadastro({ ...basico, cpf: '529.982.247-25', ...endereco }, true)).toBeNull();
+  });
+
+  it('completo: CPF e endereço continuam obrigatórios', () => {
+    expect(problemaNoCadastro(basico, false)).toMatch(/CPF/);
+    expect(problemaNoCadastro({ ...basico, cpf: '529.982.247-25' }, false)).toMatch(/CEP/);
+    expect(problemaNoCadastro({ ...basico, cpf: '529.982.247-25', ...endereco }, false)).toBeNull();
+  });
+});
+
+describe('Tela do cadastro', () => {
+  const tela = (simples: boolean, dados = clienteVazio) =>
+    renderToStaticMarkup(createElement(FormCliente, { dados, aoMudar: () => {}, simples }));
+
+  it('simples mostra só nome, WhatsApp e indicação, com o botão de mais dados', () => {
+    const html = tela(true);
+    expect(html).toContain('WhatsApp');
+    expect(html).toContain('Indicado por');
+    expect(html).toContain('Mais dados');
+    expect(html).not.toContain('000.000.000-00');
+    expect(html).not.toContain('Rua / avenida');
+  });
+
+  it('simples abre sozinho os dados extras de quem já tem CPF', () => {
+    expect(tela(true, { ...clienteVazio, cpf: '529.982.247-25' })).toContain('Rua / avenida');
+  });
+
+  it('completo mostra tudo, sem o botão', () => {
+    const html = tela(false);
+    expect(html).toContain('000.000.000-00');
+    expect(html).toContain('Rua / avenida');
+    expect(html).toContain('Indicado por');
+    expect(html).not.toContain('Mais dados');
   });
 });

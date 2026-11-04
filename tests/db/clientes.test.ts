@@ -82,6 +82,31 @@ describe('Cadastro de cliente', () => {
     await expect(salvar(null, { ...base, uf: 'São Paulo' })).rejects.toThrow(/UF/);
   });
 
+  it('cadastro simples: só nome, WhatsApp e indicação', async () => {
+    const id = await salvar(null, { nome: 'Rápido', whatsapp: '11955554444', indicacao: '  Seu Antônio  ' });
+    await comoSistema(db);
+    const c = await um<{ indicacao: string; cpf: string | null; cep: string | null }>(
+      db,
+      `select indicacao, cpf, cep from public.clientes where id = $1`,
+      [id],
+    );
+    expect(c).toEqual({ indicacao: 'Seu Antônio', cpf: null, cep: null });
+  });
+
+  it('indicação muito longa é recusada, e a alteração fica no histórico', async () => {
+    await expect(
+      salvar(null, { nome: 'Longo', whatsapp: '11955553333', indicacao: 'x'.repeat(121) }),
+    ).rejects.toThrow(/Indicado por muito longo/);
+
+    const id = await salvar(null, { nome: 'Muda', whatsapp: '11955552222', indicacao: 'Primeira' });
+    await salvar(id, { nome: 'Muda', whatsapp: '11955552222', indicacao: 'Segunda' });
+    await comoSistema(db);
+    const c = await um<{ indicacao: string }>(db, `select indicacao from public.clientes where id = $1`, [id]);
+    const h = await um<{ antes: string }>(db, `select dados_anteriores ->> 'indicacao' as antes from public.clientes_historico where cliente_id = $1`, [id]);
+    expect(c.indicacao).toBe('Segunda');
+    expect(h.antes).toBe('Primeira');
+  });
+
   it('campos vazios ficam em branco (clientes antigos continuam válidos)', async () => {
     const id = await salvar(null, { nome: 'Só Básico', whatsapp: '11977776666', cpf: '', cep: '', email: '  ' });
     const c = await ler(id);

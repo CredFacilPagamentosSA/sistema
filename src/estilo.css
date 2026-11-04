@@ -378,3 +378,6 @@ textarea { font: inherit; resize: vertical; }
 .logo-caixa img { width: 100%; height: auto; display: block; }
 .topo-marca { display: inline-flex; align-items: center; gap: 8px; }
 .topo-marca img { border-radius: 7px; background: #ffffff; flex: none; }
+
+/* Cadastro simples */
+.mais-dados { align-self: flex-start; padding: 8px 0; font-weight: 600; }

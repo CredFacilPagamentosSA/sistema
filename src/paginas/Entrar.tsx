@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
 import { supabase } from '../lib/supabase';
 import { mensagemDeErro } from '../lib/erros';
-import { NOME_EMPRESA } from '../marca';
+import { NOME_EMPRESA, PRIVACIDADE_NA_ENTRADA } from '../marca';
 
 export function Entrar() {
   const [email, setEmail] = useState('');
@@ -37,7 +37,7 @@ export function Entrar() {
         {erro && <p className="erro" role="alert">{erro}</p>}
         <button className="botao" disabled={enviando}>{enviando ? 'Entrando…' : 'Entrar'}</button>
         <Link to="/esqueci-senha" className="link-centro">Esqueci minha senha</Link>
-        <Link to="/privacidade" className="link-centro pequeno">Política de privacidade</Link>
+        {PRIVACIDADE_NA_ENTRADA && <Link to="/privacidade" className="link-centro pequeno">Política de privacidade</Link>}
       </form>
     </main>
   );

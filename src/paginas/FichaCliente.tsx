@@ -8,6 +8,7 @@ import { cadastroIncompleto, enderecoEmUmaLinha, formatarCpf, type Cliente } fro
 import { formatarWhatsapp, type Emprestimo } from '../lib/emprestimos';
 import { formatarData, formatarDataHora } from '../lib/datas';
 import { CartaoEmprestimo } from '../componentes/CartaoEmprestimo';
+import { CADASTRO_SIMPLES } from '../marca';
 
 type Alteracao = { id: number; criado_em: string; usuario_nome: string | null; usuario_email: string | null; dados_anteriores: Partial<Cliente> };
 
@@ -25,6 +26,7 @@ const nomesCampos: Partial<Record<keyof Cliente, string>> = {
   cidade: 'Cidade',
   uf: 'UF',
   observacoes: 'Observações',
+  indicacao: 'Indicado por',
   arquivado_em: 'Arquivamento',
 };
 
@@ -81,7 +83,7 @@ export function FichaCliente() {
           <strong>Cliente arquivado</strong> em {formatarDataHora(c.arquivado_em)}. Ele não aparece nas listas nem nas buscas.
         </p>
       )}
-      {cadastroIncompleto(c) && !c.arquivado_em && (
+      {!CADASTRO_SIMPLES && cadastroIncompleto(c) && !c.arquivado_em && (
         <p className="alerta">
           <strong>Cadastro incompleto.</strong> Faltam CPF ou endereço. <Link to={`/clientes/${c.id}/editar`}>Completar agora</Link>
         </p>
@@ -92,6 +94,7 @@ export function FichaCliente() {
         <div><dt>WhatsApp</dt><dd>{formatarWhatsapp(c.whatsapp)}</dd></div>
         <div><dt>Nascimento</dt><dd>{c.data_nascimento ? formatarData(c.data_nascimento) : '—'}</dd></div>
         <div><dt>E-mail</dt><dd>{c.email ?? '—'}</dd></div>
+        {c.indicacao && <div className="inteira"><dt>Indicado por</dt><dd>{c.indicacao}</dd></div>}
         <div className="inteira"><dt>Endereço</dt><dd>{enderecoEmUmaLinha(c) || '—'}</dd></div>
         {c.observacoes && <div className="inteira"><dt>Observações</dt><dd>{c.observacoes}</dd></div>}
         <div className="inteira"><dt>Cliente desde</dt><dd>{formatarDataHora(c.criado_em)}</dd></div>

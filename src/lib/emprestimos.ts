@@ -84,7 +84,7 @@ function primeiroNome(nome: string): string {
 }
 
 // Mensagem pronta de cobrança (Fase 1: só copiar, nada é enviado sozinho)
-export function mensagemCobranca(e: Emprestimo, empresa: string): string {
+export function mensagemCobranca(e: Emprestimo, empresa: string | null): string {
   let quando: string;
   if (e.situacao === 'atrasado') quando = `venceu em ${formatarData(e.vencimento)}`;
   else if (e.situacao === 'vence_hoje') quando = `vence hoje (${formatarData(e.vencimento)})`;
@@ -93,7 +93,7 @@ export function mensagemCobranca(e: Emprestimo, empresa: string): string {
   return [
     `Olá, ${primeiroNome(e.cliente_nome)}! Tudo bem?`,
     ``,
-    `Passando para lembrar que o seu empréstimo com a ${empresa} ${quando}.`,
+    `Passando para lembrar que o seu empréstimo${empresa ? ` com a ${empresa}` : ''} ${quando}.`,
     ``,
     `Você pode escolher uma das opções:`,
     ``,

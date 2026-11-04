@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { useCarregar } from '../lib/useCarregar';
 import { formatarWhatsapp, mensagemCobranca } from '../lib/emprestimos';
-import { NOME_EMPRESA } from '../marca';
+import { EMPRESA_NA_COBRANCA } from '../marca';
 import { buscarEmprestimo } from './DetalheEmprestimo';
 
 export function Cobrar() {
@@ -14,7 +14,7 @@ export function Cobrar() {
   if (erro || !dados) return <p className="erro">{erro || 'Empréstimo não encontrado.'}</p>;
 
   const e = dados.emprestimo;
-  const texto = mensagemCobranca(e, NOME_EMPRESA);
+  const texto = mensagemCobranca(e, EMPRESA_NA_COBRANCA);
 
   async function copiar() {
     try {

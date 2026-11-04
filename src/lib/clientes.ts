@@ -14,6 +14,7 @@ export type Cliente = {
   cidade: string | null;
   uf: string | null;
   observacoes: string | null;
+  indicacao: string | null;
   criado_em: string;
   atualizado_em: string | null;
   arquivado_em: string | null;
@@ -34,6 +35,7 @@ export type DadosCliente = {
   cidade: string;
   uf: string;
   observacoes: string;
+  indicacao: string;
 };
 
 export const clienteVazio: DadosCliente = {
@@ -50,6 +52,7 @@ export const clienteVazio: DadosCliente = {
   cidade: '',
   uf: '',
   observacoes: '',
+  indicacao: '',
 };
 
 export const UFS = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
@@ -111,7 +114,28 @@ export function dadosDoCliente(c: Cliente): DadosCliente {
     cidade: c.cidade ?? '',
     uf: c.uf ?? '',
     observacoes: c.observacoes ?? '',
+    indicacao: c.indicacao ?? '',
   };
+}
+
+// Campos que o app exige. No cadastro simples, só nome e WhatsApp; o que for preenchido a mais ainda é conferido.
+export function problemaNoCadastro(d: DadosCliente, simples: boolean): string | null {
+  if (!d.nome.trim()) return 'Informe o nome do cliente.';
+  const tel = soNumeros(d.whatsapp);
+  if (!(tel.length === 10 || tel.length === 11 || ((tel.length === 12 || tel.length === 13) && tel.startsWith('55')))) {
+    return 'WhatsApp inválido: informe DDD + número, por exemplo (11) 91234-5678.';
+  }
+  if (!simples && !d.cpf.trim()) return 'Informe o CPF do cliente.';
+  if (d.cpf.trim() && !cpfValido(d.cpf)) return 'CPF inválido: confira os números.';
+  if (d.email.trim() && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email.trim())) return 'E-mail inválido.';
+  if ((!simples || d.cep.trim()) && soNumeros(d.cep).length !== 8) return 'Informe o CEP (8 números).';
+  if (simples) return null;
+  if (!d.logradouro.trim()) return 'Informe a rua / avenida do endereço.';
+  if (!d.numero.trim()) return 'Informe o número do endereço (ou "s/n").';
+  if (!d.bairro.trim()) return 'Informe o bairro.';
+  if (!d.cidade.trim()) return 'Informe a cidade.';
+  if (!d.uf) return 'Informe o estado (UF).';
+  return null;
 }
 
 // Busca o endereço pelo CEP no ViaCEP (serviço público e gratuito; só o CEP é enviado)

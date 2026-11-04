@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { supabase } from '../lib/supabase';
 import { consultar, useCarregar } from '../lib/useCarregar';
 import { cadastroIncompleto, formatarCpf, soNumeros, type Cliente } from '../lib/clientes';
+import { CADASTRO_SIMPLES } from '../marca';
 import { formatarWhatsapp } from '../lib/emprestimos';
 
 type ClienteComContagem = Cliente & { abertos: number };
@@ -32,6 +33,7 @@ export function Clientes() {
       !!c.arquivado_em === verArquivados &&
       (!termo ||
         simplificar(c.nome).includes(termo) ||
+        simplificar(c.indicacao ?? '').includes(termo) ||
         (numeros.length >= 3 && ((c.cpf ?? '').includes(numeros) || c.whatsapp.includes(numeros)))),
   );
 
@@ -41,7 +43,7 @@ export function Clientes() {
         <h1>Clientes</h1>
         <Link to="/clientes/novo" className="botao pequeno-botao">+ Cliente</Link>
       </div>
-      <input type="search" placeholder="Buscar por nome, CPF ou telefone" value={busca} onChange={(e) => setBusca(e.target.value)} aria-label="Buscar cliente" />
+      <input type="search" placeholder={CADASTRO_SIMPLES ? 'Buscar por nome, telefone ou indicação' : 'Buscar por nome, CPF ou telefone'} value={busca} onChange={(e) => setBusca(e.target.value)} aria-label="Buscar cliente" />
       {(arquivados > 0 || verArquivados) && (
         <div className="filtros" role="tablist">
           <button role="tab" aria-selected={!verArquivados} className={!verArquivados ? 'ativo' : ''} onClick={() => setVerArquivados(false)}>
@@ -66,10 +68,10 @@ export function Clientes() {
                 {c.abertos > 0 && <span className="etiqueta">{c.abertos} em aberto</span>}
               </div>
               <div className="linha pequeno suave">
-                <span>{c.cpf ? `CPF ${formatarCpf(c.cpf)}` : 'Sem CPF'}</span>
+                <span>{CADASTRO_SIMPLES ? (c.indicacao ? `Indicado por ${c.indicacao}` : '') : c.cpf ? `CPF ${formatarCpf(c.cpf)}` : 'Sem CPF'}</span>
                 <span>{formatarWhatsapp(c.whatsapp)}</span>
               </div>
-              {cadastroIncompleto(c) && <div className="risco pequeno">Cadastro incompleto: faltam CPF ou endereço</div>}
+              {!CADASTRO_SIMPLES && cadastroIncompleto(c) && <div className="risco pequeno">Cadastro incompleto: faltam CPF ou endereço</div>}
             </Link>
           </li>
         ))}

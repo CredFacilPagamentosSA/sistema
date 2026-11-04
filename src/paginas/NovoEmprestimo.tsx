@@ -8,6 +8,7 @@ import { formatarWhatsapp } from '../lib/emprestimos';
 import { clienteVazio, formatarCpf, soNumeros, type Cliente } from '../lib/clientes';
 import { CampoDinheiro, CampoJuros } from '../componentes/Campos';
 import { FormCliente, validarCliente } from '../componentes/FormCliente';
+import { CADASTRO_SIMPLES } from '../marca';
 
 function simplificar(texto: string) {
   return texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -119,12 +120,13 @@ export function NovoEmprestimo() {
                 )}
               </div>
               <div className="pequeno suave">
-                {escolhido.cpf ? `CPF ${formatarCpf(escolhido.cpf)}` : 'Sem CPF'} · {formatarWhatsapp(escolhido.whatsapp)}
+                {!CADASTRO_SIMPLES && `${escolhido.cpf ? `CPF ${formatarCpf(escolhido.cpf)}` : 'Sem CPF'} · `}
+                {formatarWhatsapp(escolhido.whatsapp)}
               </div>
             </div>
           ) : (
             <>
-              <input type="search" placeholder="Buscar por nome, CPF ou telefone" value={busca} onChange={(ev) => setBusca(ev.target.value)} aria-label="Buscar cliente" />
+              <input type="search" placeholder={CADASTRO_SIMPLES ? 'Buscar por nome ou telefone' : 'Buscar por nome, CPF ou telefone'} value={busca} onChange={(ev) => setBusca(ev.target.value)} aria-label="Buscar cliente" />
               {termo && encontrados.length === 0 && <p className="suave pequeno">Nenhum cliente encontrado. Use "Cliente novo".</p>}
               <ul className="menu-lista">
                 {encontrados.map((c) => (
